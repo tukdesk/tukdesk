@@ -74,6 +74,10 @@ func (this *User) FindOne(query map[string]interface{}) error {
 	return FindOne(UserCollectionName, query, this)
 }
 
+func (this *User) FindAndModify(query, change map[string]interface{}) error {
+	return FindAndModify(UserCollectionName, query, change, this)
+}
+
 func (this *User) FindOrInsert(query map[string]interface{}, doc *User) (bool, error) {
 	return FindOrInsert(UserCollectionName, query, doc, this)
 }

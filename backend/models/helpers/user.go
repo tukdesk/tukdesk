@@ -109,3 +109,8 @@ func UserGetValidNameFromEmail(email string) string {
 	name, _ := tools.CutEmail(email)
 	return UserGetValidName(name)
 }
+
+func UserFindAndModifyWithUser(user *models.User, change map[string]interface{}) error {
+	query := M{"_id": user.Id}
+	return user.FindAndModify(query, change)
+}

@@ -41,21 +41,21 @@ func IsInvalidToken(err error) bool {
 	return strings.HasPrefix(err.Error(), errInvalidTokenPrefix)
 }
 
-func TokenForUser(user *models.User, key []byte) string {
+func TokenForUser(user *models.User, key string) string {
 	data := map[string]interface{}{
 		"type": TokenType,
 		"uid":  user.Id.Hex(),
 	}
 
-	return tools.GenerateToken(data, TokenDefaultExpiration, key)
+	return tools.GenerateToken(data, TokenDefaultExpiration, []byte(key))
 }
 
-func UserFromRequest(r *http.Request, key []byte) (*models.User, bool, error) {
+func UserFromRequest(r *http.Request, key string) (*models.User, bool, error) {
 	t := r.Header.Get("Authorization")
 	if t == "" {
 		return nil, false, ErrTokenNotFound
 	}
-	return UserFromToken(t, key)
+	return UserFromToken(t, []byte(key))
 }
 
 func UserFromToken(t string, key []byte) (*models.User, bool, error) {

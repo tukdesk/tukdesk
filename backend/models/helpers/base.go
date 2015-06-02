@@ -5,6 +5,10 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+const (
+	LimitedDataFieldMaxLength = 200
+)
+
 var (
 	EmptyId     = mgoutils.EmptyObjectId
 	ErrNotFound = mgoutils.ErrNotFound

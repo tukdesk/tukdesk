@@ -18,12 +18,25 @@ func BrandFindOne(query map[string]interface{}) (*models.Brand, error) {
 
 func BrandInit(name string) (*models.Brand, error) {
 	brand := models.NewBrand(name)
-	brand.APIKey = []byte(tools.RandString(BrandAPIKeyLength))
-	brand.Salt = tools.RandString(BrandSaltLength)
+	brand.Authorization.APIKey = BrandNewAPIKey()
+	brand.Authorization.Salt = BrandNewSalt()
 	if err := brand.Insert(); err != nil {
 		return nil, err
 	}
 
 	setCurrentBrand(brand)
 	return brand, nil
+}
+
+func BrandNewAPIKey() string {
+	return tools.RandString(BrandAPIKeyLength)
+}
+
+func BrandNewSalt() string {
+	return tools.RandString(BrandSaltLength)
+}
+
+func BrandUpdateCurrent(change map[string]interface{}) error {
+	query := M{"_id": currentBrand.Id}
+	return currentBrand.FindAndModify(query, change)
 }

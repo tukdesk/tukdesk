@@ -3,17 +3,24 @@ package apis
 import (
 	"fmt"
 	"net/http"
+	"time"
 
+	"github.com/tukdesk/tukdesk/backend/models"
 	"github.com/tukdesk/tukdesk/backend/models/helpers"
 	"github.com/zenazn/goji/web"
 
 	"github.com/astaxie/beego/validation"
+	"github.com/tukdesk/httputils/gojimiddleware"
 	"github.com/tukdesk/httputils/jsonutils"
 )
 
 func abort(err error) {
 	panic(err)
 	return
+}
+
+func NowUnix() int64 {
+	return time.Now().Unix()
 }
 
 func CheckCurrentBrand() {
@@ -24,21 +31,30 @@ func CheckCurrentBrand() {
 	return
 }
 
-func CheckAuthorizedAsAgent(c *web.C) {
-	user := GetCurrentUser(c)
+func CheckAuthorizedAsAgent(c *web.C, w http.ResponseWriter, r *http.Request) *models.User {
+	user := GetCurrentUser(c, w, r)
 	if !AuthorizedAsAgent(user) {
 		abort(ErrUnauthorized)
 	}
-	return
+	return user
 }
 
-func FirstError(v *validation.Validation) error {
+func CheckAuthorizedLogged(c *web.C, w http.ResponseWriter, r *http.Request) *models.User {
+	user := GetCurrentUser(c, w, r)
+	if !AuthorizedLogged(user) {
+		abort(ErrUnlogged)
+	}
+	return user
+}
+
+func CheckValidation(v *validation.Validation) {
 	if !v.HasErrors() {
-		return nil
+		return
 	}
 
 	e := v.Errors[0]
-	return ErrInvaidArgsWithMsg(fmt.Sprintf("%s : %s", e.Key, e.Message))
+	abort(ErrInvaidArgsWithMsg(fmt.Sprintf("%s : %s", e.Key, e.Message)))
+	return
 }
 
 func GetJsonArgsFromRequest(r *http.Request, args interface{}) {
@@ -46,4 +62,17 @@ func GetJsonArgsFromRequest(r *http.Request, args interface{}) {
 		abort(ErrInvalidRequestBodyWithError(err))
 		return
 	}
+}
+
+func GetLogger(c *web.C, w http.ResponseWriter, r *http.Request) *gojimiddleware.XLogger {
+	return gojimiddleware.GetRequestLogger(c, w, r)
+}
+
+func OutputJson(data interface{}, w http.ResponseWriter, r *http.Request) {
+	jsonutils.OutputJson(data, w, r)
+	return
+}
+
+func ChangeSetM(setM map[string]interface{}) helpers.M {
+	return helpers.M{"$set": setM}
 }

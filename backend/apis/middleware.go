@@ -7,7 +7,6 @@ import (
 	"github.com/tukdesk/tukdesk/backend/models/helpers"
 
 	"github.com/tukdesk/httputils/gojimiddleware"
-	"github.com/tukdesk/httputils/jsonutils"
 	"github.com/zenazn/goji/web"
 )
 
@@ -17,25 +16,33 @@ const (
 
 func CurrentUser(c *web.C, h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
+		// check brand
 		if helpers.CurrentBrand() == nil {
-			jsonutils.OutputJsonError(ErrBrandNotFound, w, r)
+			abort(ErrBrandNotFound)
 			return
 		}
 
-		user, _, err := helpers.UserFromRequest(r, helpers.CurrentBrand().APIKey)
-		if err != nil && err != helpers.ErrTokenNotFound && !helpers.IsInvalidToken(err) {
-			logger := gojimiddleware.GetRequestLogger(c, w, r)
-			logger.Error(err)
-			jsonutils.OutputJsonError(ErrInternalError, w, r)
-			return
-		}
+		// get current user
+		GetCurrentUser(c, w, r)
 
-		c.Env[currentUserKey] = user
 		h.ServeHTTP(w, r)
 	}
 	return http.HandlerFunc(fn)
 }
 
-func GetCurrentUser(c *web.C) *models.User {
-	return c.Env[currentUserKey].(*models.User)
+func GetCurrentUser(c *web.C, w http.ResponseWriter, r *http.Request) *models.User {
+	if user, ok := c.Env[currentUserKey].(*models.User); ok {
+		return user
+	}
+
+	user, _, err := helpers.UserFromRequest(r, helpers.CurrentBrand().Authorization.APIKey)
+	if err != nil && err != helpers.ErrTokenNotFound && !helpers.IsInvalidToken(err) {
+		logger := gojimiddleware.GetRequestLogger(c, w, r)
+		logger.Error(err)
+		abort(ErrInternalError)
+		return nil
+	}
+
+	c.Env[currentUserKey] = user
+	return user
 }

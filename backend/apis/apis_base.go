@@ -8,7 +8,6 @@ import (
 
 	"github.com/astaxie/beego/validation"
 	"github.com/tukdesk/httputils/gojimiddleware"
-	"github.com/tukdesk/httputils/jsonutils"
 	"github.com/zenazn/goji/web"
 )
 
@@ -47,23 +46,20 @@ func (this *BaseModule) brandInit(c web.C, w http.ResponseWriter, r *http.Reques
 	v.Required(args.Password, "password")
 	v.MinSize(args.Password, helpers.UserPasswordMinLength, "password")
 
-	if err := FirstError(v); err != nil {
-		jsonutils.OutputJsonError(err, w, r)
-		return
-	}
+	CheckValidation(v)
 
-	logger := gojimiddleware.GetRequestLogger(&c, w, r)
+	logger := GetLogger(&c, w, r)
 
 	// brand init
 	brand, err := helpers.BrandInit(args.BrandName)
 	if helpers.IsDup(err) {
-		jsonutils.OutputJsonError(ErrBrandAlreadyInitialized, w, r)
+		abort(ErrBrandAlreadyInitialized)
 		return
 	}
 
 	if err != nil {
 		logger.Error(err)
-		jsonutils.OutputJsonError(ErrInternalError, w, r)
+		abort(ErrInternalError)
 		return
 	}
 
@@ -72,14 +68,14 @@ func (this *BaseModule) brandInit(c web.C, w http.ResponseWriter, r *http.Reques
 		args.Name = helpers.UserGetValidNameFromEmail(args.Email)
 	}
 
-	_, err = helpers.AgentInit(args.Email, args.Name, args.Password, brand.Salt)
+	_, err = helpers.AgentInit(args.Email, args.Name, args.Password, brand.Authorization.Salt)
 	if err != nil {
 		logger.Error(err)
-		jsonutils.OutputJsonError(ErrInternalError, w, r)
+		abort(ErrInternalError)
 		return
 	}
 
-	jsonutils.OutputJson(brand, w, r)
+	OutputJson(brand, w, r)
 	return
 }
 
@@ -93,35 +89,28 @@ func (this *BaseModule) signup(c web.C, w http.ResponseWriter, r *http.Request) 
 
 	v.Required(args.Password, "password")
 	v.MinSize(args.Password, helpers.UserPasswordMinLength, "password")
-	if err := FirstError(v); err != nil {
-		jsonutils.OutputJsonError(err, w, r)
-		return
-	}
+	CheckValidation(v)
 
-	logger := gojimiddleware.GetRequestLogger(&c, w, r)
+	logger := GetLogger(&c, w, r)
 
 	user, err := helpers.AgentFind()
 	if helpers.IsNotFound(err) {
-		jsonutils.OutputJsonError(ErrAgentNotFound, w, r)
+		abort(ErrAgentNotFound)
 		return
 	}
 
 	if err != nil {
 		logger.Error(err)
-		jsonutils.OutputJsonError(ErrInternalError, w, r)
+		abort(ErrInternalError)
 		return
 	}
 
-	if !helpers.UserCheckPassword(user, args.Password, helpers.CurrentBrand().Salt) {
-		jsonutils.OutputJsonError(ErrAgentPasswordNotMatch, w, r)
+	if !helpers.UserCheckPassword(user, args.Password, helpers.CurrentBrand().Authorization.Salt) {
+		abort(ErrAgentPasswordNotMatch)
 		return
 	}
 
-	output := &helpers.OutputToken{
-		Token:      helpers.TokenForUser(user, helpers.CurrentBrand().APIKey),
-		Expiration: helpers.TokenDefaultExpirationSec,
-	}
-
-	jsonutils.OutputJson(output, w, r)
+	output := helpers.OuputToken(helpers.TokenForUser(user, helpers.CurrentBrand().Authorization.APIKey), helpers.TokenDefaultExpirationSec)
+	OutputJson(output, w, r)
 	return
 }

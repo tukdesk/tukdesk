@@ -1,6 +1,8 @@
 package helpers
 
-type OutputToken struct {
-	Token      string `json:"token"`
-	Expiration int64  `json:"expiration"`
+func OuputToken(token string, expirationSec int64) M {
+	return M{
+		"token":      token,
+		"expiration": expirationSec,
+	}
 }

@@ -36,6 +36,7 @@ func main() {
 
 	apis.RegisterBaseModule(cfg, app.Mux())
 	apis.RegisterBrandModule(cfg, app.Mux())
+	apis.RegisterProfileModule(cfg, app.Mux())
 
 	app.Mux().Use(gojimiddleware.RequestLogger)
 	app.Mux().Use(gojimiddleware.RequestTimer)

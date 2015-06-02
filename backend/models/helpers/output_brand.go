@@ -1,5 +1,7 @@
 package helpers
 
-type OutputAPIKey struct {
-	Key string `json:"key"`
+func OutputAPIKey(key string) M {
+	return M{
+		"key": key,
+	}
 }
