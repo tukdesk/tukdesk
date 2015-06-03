@@ -6,7 +6,6 @@ import (
 	"github.com/tukdesk/tukdesk/backend/config"
 	"github.com/tukdesk/tukdesk/backend/models/helpers"
 
-	"github.com/astaxie/beego/validation"
 	"github.com/tukdesk/httputils/gojimiddleware"
 	"github.com/zenazn/goji/web"
 )
@@ -21,7 +20,7 @@ func RegisterBrandModule(cfg config.Config, app *web.Mux) *web.Mux {
 	}
 
 	mux := web.New()
-	mux.Use(CurrentUser)
+
 	mux.Get("", m.brandInfo)
 	mux.Put("", m.brandUpdate)
 	mux.Get("/key", m.brandAPIKey)
@@ -33,7 +32,7 @@ func RegisterBrandModule(cfg config.Config, app *web.Mux) *web.Mux {
 
 func (this *BrandModule) brandAPIKey(c web.C, w http.ResponseWriter, r *http.Request) {
 	CheckAuthorizedAsAgent(&c, w, r)
-	output := helpers.OutputAPIKey(helpers.CurrentBrand().Authorization.APIKey)
+	output := helpers.OutputBrandAPIKey(helpers.CurrentBrand().Authorization.APIKey)
 	OutputJson(output, w, r)
 	return
 }
@@ -49,17 +48,17 @@ func (this *BrandModule) brandUpdate(c web.C, w http.ResponseWriter, r *http.Req
 	args := &BrandUpdateArgs{}
 	GetJsonArgsFromRequest(r, args)
 
-	v := &validation.Validation{}
+	v := helpers.ValidationNew()
 	setM := helpers.M{}
 	brand := helpers.CurrentBrand()
 
 	if args.Base.Name != "" && args.Base.Name != brand.Base.Name {
-		v.MaxSize(args.Base.Name, helpers.BrandNameMaxLength, "name")
+		helpers.ValidationForBrandName(v, "name", args.Base.Name)
 		setM["base.name"] = args.Base.Name
 	}
 
 	if args.Base.Logo != "" && args.Base.Logo != brand.Base.Logo {
-		v.MaxSize(args.Base.Logo, helpers.LimitedDataFieldMaxLength, "logo")
+		helpers.ValidationForBrandLogo(v, "logo", args.Base.Logo)
 		setM["base.logo"] = args.Base.Logo
 	}
 
@@ -94,7 +93,7 @@ func (this *BrandModule) brandResetAPIKey(c web.C, w http.ResponseWriter, r *htt
 		return
 	}
 
-	output := helpers.OutputAPIKey(helpers.CurrentBrand().Authorization.APIKey)
+	output := helpers.OutputBrandAPIKey(helpers.CurrentBrand().Authorization.APIKey)
 	OutputJson(output, w, r)
 	return
 }

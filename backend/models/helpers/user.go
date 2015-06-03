@@ -90,6 +90,10 @@ func UserMustByChannel(chName, chId, email, name string) (*models.User, bool, er
 	return user, inserted, err
 }
 
+func UserMustForChannelEmail(email, name string) (*models.User, bool, error) {
+	return UserMustByChannel(UserChannelEmail, email, email, name)
+}
+
 func UserFindByChannel(chName, chId string) (*models.User, error) {
 	query := M{
 		"channel.name": chName,

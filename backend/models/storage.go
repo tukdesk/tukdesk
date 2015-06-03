@@ -32,6 +32,13 @@ func FindOne(collName string, query map[string]interface{}, result interface{}) 
 	return c.FindOne(query, result)
 }
 
+func Count(collName string, query map[string]interface{}) (int, error) {
+	c := storage.GetCollection(collName)
+	defer storage.ReleaseCollection(c)
+
+	return c.Count(query)
+}
+
 func List(collName string, query map[string]interface{}, start, limit int, sort []string, result interface{}) error {
 	c := storage.GetCollection(collName)
 	defer storage.ReleaseCollection(c)

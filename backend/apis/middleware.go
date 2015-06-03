@@ -16,12 +16,6 @@ const (
 
 func CurrentUser(c *web.C, h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-		// check brand
-		if helpers.CurrentBrand() == nil {
-			abort(ErrBrandNotFound)
-			return
-		}
-
 		// get current user
 		GetCurrentUser(c, w, r)
 
@@ -31,6 +25,11 @@ func CurrentUser(c *web.C, h http.Handler) http.Handler {
 }
 
 func GetCurrentUser(c *web.C, w http.ResponseWriter, r *http.Request) *models.User {
+	if helpers.CurrentBrand() == nil {
+		abort(ErrBrandNotFound)
+		return nil
+	}
+
 	if user, ok := c.Env[currentUserKey].(*models.User); ok {
 		return user
 	}
@@ -41,6 +40,10 @@ func GetCurrentUser(c *web.C, w http.ResponseWriter, r *http.Request) *models.Us
 		logger.Error(err)
 		abort(ErrInternalError)
 		return nil
+	}
+
+	if err != nil {
+		user = nil
 	}
 
 	c.Env[currentUserKey] = user

@@ -31,4 +31,6 @@ var (
 
 	ErrAgentNotFound         = jsonutils.NewAPIError(http.StatusBadRequest, 110201, "agent not found")
 	ErrAgentPasswordNotMatch = jsonutils.NewAPIError(http.StatusForbidden, 110202, "passwod not match")
+
+	ErrTicketDuplicate = jsonutils.NewAPIError(http.StatusBadRequest, 110301, "ticket with duplicate channel")
 )

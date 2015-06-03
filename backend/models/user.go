@@ -8,6 +8,10 @@ const (
 	UserCollectionName = "user"
 )
 
+var (
+	EmptyUser = &User{}
+)
+
 type UserLoginInfo struct {
 	Password string `json:"-" bson:"password"`
 }

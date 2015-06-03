@@ -6,7 +6,6 @@ import (
 	"github.com/tukdesk/tukdesk/backend/config"
 	"github.com/tukdesk/tukdesk/backend/models/helpers"
 
-	"github.com/astaxie/beego/validation"
 	"github.com/tukdesk/httputils/gojimiddleware"
 	"github.com/zenazn/goji/web"
 )
@@ -21,6 +20,8 @@ func RegisterProfileModule(cfg config.Config, app *web.Mux) *web.Mux {
 	}
 
 	mux := web.New()
+	mux.Use(CurrentUser)
+
 	mux.Get("", m.profile)
 	mux.Put("", m.profileUpdate)
 
@@ -30,7 +31,7 @@ func RegisterProfileModule(cfg config.Config, app *web.Mux) *web.Mux {
 
 func (this *ProfileModule) profile(c web.C, w http.ResponseWriter, r *http.Request) {
 	user := CheckAuthorizedLogged(&c, w, r)
-	output := helpers.OutputProfile(user)
+	output := helpers.OutputUserProfileInfo(user)
 	OutputJson(output, w, r)
 	return
 }
@@ -41,16 +42,16 @@ func (this *ProfileModule) profileUpdate(c web.C, w http.ResponseWriter, r *http
 	args := &ProfileUpdateArgs{}
 	GetJsonArgsFromRequest(r, args)
 
-	v := &validation.Validation{}
+	v := helpers.ValidationNew()
 	setM := helpers.M{}
 
 	if args.Base.Name != "" && args.Base.Name != user.Base.Name {
-		v.MaxSize(args.Base.Name, helpers.UserNameMaxLength, "name")
+		helpers.ValidationForUserName(v, "name", args.Base.Name)
 		setM["base.name"] = args.Base.Name
 	}
 
 	if args.Base.Avatar != "" && args.Base.Avatar != user.Base.Avatar {
-		v.MaxSize(args.Base.Avatar, helpers.LimitedDataFieldMaxLength, "avatar")
+		helpers.ValidationForUserAvatar(v, "avatar", args.Base.Avatar)
 		setM["base.avatar"] = args.Base.Avatar
 	}
 
@@ -65,7 +66,7 @@ func (this *ProfileModule) profileUpdate(c web.C, w http.ResponseWriter, r *http
 		}
 	}
 
-	output := helpers.OutputProfile(user)
+	output := helpers.OutputUserProfileInfo(user)
 	OutputJson(output, w, r)
 	return
 }

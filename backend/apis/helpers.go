@@ -9,9 +9,9 @@ import (
 	"github.com/tukdesk/tukdesk/backend/models/helpers"
 	"github.com/zenazn/goji/web"
 
-	"github.com/astaxie/beego/validation"
 	"github.com/tukdesk/httputils/gojimiddleware"
 	"github.com/tukdesk/httputils/jsonutils"
+	"github.com/tukdesk/httputils/validation"
 )
 
 func abort(err error) {
@@ -52,7 +52,7 @@ func CheckValidation(v *validation.Validation) {
 		return
 	}
 
-	e := v.Errors[0]
+	e := v.Errors()[0]
 	abort(ErrInvaidArgsWithMsg(fmt.Sprintf("%s : %s", e.Key, e.Message)))
 	return
 }

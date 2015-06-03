@@ -1,7 +1,11 @@
 package helpers
 
-func OutputAPIKey(key string) M {
-	return M{
-		"key": key,
+type OutputBrandKEyInfo struct {
+	Key string `json:"key"`
+}
+
+func OutputBrandAPIKey(key string) *OutputBrandKEyInfo {
+	return &OutputBrandKEyInfo{
+		Key: key,
 	}
 }

@@ -18,6 +18,11 @@ type BrandAutorizationInfo struct {
 	Salt   string `json:"salt" bson:"salt"`
 }
 
+type BrandPreExtend struct {
+	Ticket []*ExtendField `json:"ticket" bson:"ticket"`
+	Client []*ExtendField `json:"client" bson:"ticket"`
+}
+
 type Brand struct {
 	Id      bson.ObjectId `json:"id" bson:"_id"`
 	Created int64         `json:"created" bson:"created"`
@@ -25,6 +30,7 @@ type Brand struct {
 
 	Base          BrandBaseInfo         `json:"base" bson:"base"`
 	Authorization BrandAutorizationInfo `json:"-" bson:"authorization"`
+	PreExtend     BrandPreExtend        `json:"-" bson:"preExtend"`
 	On            bool                  `json:"-" bson:"on"`
 }
 

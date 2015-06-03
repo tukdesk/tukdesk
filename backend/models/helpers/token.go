@@ -8,7 +8,6 @@ import (
 
 	"github.com/tukdesk/tukdesk/backend/models"
 
-	"github.com/astaxie/beego/validation"
 	"github.com/tukdesk/httputils/tools"
 )
 
@@ -117,8 +116,8 @@ func UserFromToken(t string, key []byte) (*models.User, bool, error) {
 	}
 
 	if email != "" {
-		v := &validation.Validation{}
-		v.Email(email, "email")
+		v := ValidationNew()
+		ValidationForEmail(v, "email", email)
 		if v.HasErrors() {
 			if chName == UserChannelEmail {
 				return nil, false, ErrInvalidTokenInvalidEmail

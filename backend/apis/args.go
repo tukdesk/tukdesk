@@ -25,3 +25,14 @@ type BrandUpdateArgs struct {
 type ProfileUpdateArgs struct {
 	Base models.UserBaseInfo `json:"base"`
 }
+
+// ticket
+type TicketAddArgs struct {
+	Email    string            `json:"email"`
+	Channel  string            `json:"channel`
+	Subject  string            `json:"subject"`
+	Content  string            `json:"content"`
+	Status   string            `json:"status"`
+	IsPublic bool              `json:"isPublic,omitempty"`
+	Extend   map[string]string `json:"extend"`
+}
