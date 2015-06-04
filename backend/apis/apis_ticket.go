@@ -33,7 +33,7 @@ func RegisterTicketsModule(cfg config.Config, app *web.Mux) *web.Mux {
 	mux.Put("/:ticketId", m.ticketUpdate)
 	mux.Get("/:ticketId/comments", m.commentList)
 	mux.Post("/:ticketId/comments", m.commentAdd)
-	mux.Put("/:ticketId/comments/:commentsId", m.commentUpdate)
+	mux.Put("/:ticketId/comments/:commentId", m.commentUpdate)
 
 	gojimiddleware.RegisterSubroute("/tickets", app, mux)
 	return mux
@@ -636,5 +636,13 @@ func (this *TicketModule) commentUpdate(c web.C, w http.ResponseWriter, r *http.
 		}
 	}
 
+	output, err := helpers.OutputCommentInfo(comment)
+	if err != nil {
+		logger.Error(err)
+		abort(ErrInternalError)
+		return
+	}
+
+	OutputJson(output, w, r)
 	return
 }
