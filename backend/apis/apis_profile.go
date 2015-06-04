@@ -59,7 +59,7 @@ func (this *ProfileModule) profileUpdate(c web.C, w http.ResponseWriter, r *http
 
 	if len(setM) > 0 {
 		setM["updated"] = NowUnix()
-		if err := helpers.UserFindAndModifyWithUser(user, ChangeSetM(setM)); err != nil {
+		if err := helpers.UserFindAndModify(user, ChangeSetM(setM)); err != nil {
 			GetLogger(&c, w, r).Error(err)
 			abort(ErrInternalError)
 			return

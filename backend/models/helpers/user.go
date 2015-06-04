@@ -4,6 +4,7 @@ import (
 	"github.com/tukdesk/tukdesk/backend/models"
 
 	"github.com/tukdesk/httputils/tools"
+	"gopkg.in/mgo.v2/bson"
 )
 
 const (
@@ -14,6 +15,21 @@ const (
 	UserPasswordMinLength = 6
 
 	UserRandNameLength = 6
+)
+
+var (
+	UserImportanceOptions = []interface{}{
+		models.UserImportanceNormal,
+		models.UserImportanceImportant,
+		models.UserImportanceVIP,
+	}
+
+	UserSortOptionsForList = []interface{}{
+		"created",
+		"-created",
+		"-business.importance",
+		"business.importance",
+	}
 )
 
 func AgentInit(email, name, password, salt string) (*models.User, error) {
@@ -55,6 +71,16 @@ func UserIsAgent(user *models.User) bool {
 func UserFindById(id interface{}) (*models.User, error) {
 	user := &models.User{}
 	return user, user.FindById(id)
+}
+
+func ClientFindById(id interface{}) (*models.User, error) {
+	query := M{
+		"_id":          id,
+		"channel.name": M{"$ne": UserChannelAgent},
+	}
+
+	user := &models.User{}
+	return user, user.FindOne(query)
 }
 
 func UserMustByChannel(chName, chId, email, name string) (*models.User, bool, error) {
@@ -114,7 +140,39 @@ func UserGetValidNameFromEmail(email string) string {
 	return UserGetValidName(name)
 }
 
-func UserFindAndModifyWithUser(user *models.User, change map[string]interface{}) error {
+func UserFindAndModify(user *models.User, change map[string]interface{}) error {
 	query := M{"_id": user.Id}
 	return user.FindAndModify(query, change)
+}
+
+func UserCount(query map[string]interface{}) (int, error) {
+	return models.EmptyUser.Count(query)
+}
+
+func UserListAfter(query map[string]interface{}, lastId bson.ObjectId, limit int, sort []string) ([]*models.User, error) {
+	if !IsEmptyId(lastId) {
+		if query == nil {
+			query = M{}
+		}
+		query["_id"] = M{"$gt": lastId}
+	}
+
+	return models.EmptyUser.List(query, 0, limit, sort)
+}
+
+func ClientCount(query map[string]interface{}) (int, error) {
+	if query == nil {
+		query = M{}
+	}
+	query["channel.name"] = M{"$ne": UserChannelAgent}
+	return UserCount(query)
+}
+
+func ClientListAfter(query map[string]interface{}, lastId bson.ObjectId, limit int, sort []string) ([]*models.User, error) {
+	if query == nil {
+		query = M{}
+	}
+	query["channel.name"] = M{"$ne": UserChannelAgent}
+
+	return UserListAfter(query, lastId, limit, sort)
 }

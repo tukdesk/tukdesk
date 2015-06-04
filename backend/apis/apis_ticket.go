@@ -50,7 +50,7 @@ func (this *TicketModule) ticketList(c web.C, w http.ResponseWriter, r *http.Req
 	v := helpers.ValidationNew()
 
 	if listArgs.Sort != "" {
-		v.In("sort", listArgs.Sort, helpers.TicketSortOptionsForList)
+		helpers.ValidationForTicektListSort(v, "sort", listArgs.Sort)
 	}
 
 	CheckValidation(v)
@@ -135,9 +135,12 @@ func (this *TicketModule) ticketAdd(c web.C, w http.ResponseWriter, r *http.Requ
 		args.Channel = helpers.TicketChannelWeb
 	}
 
+	args.Extend = helpers.TicketParseExtendFromPreSet(args.Extend)
+
 	v := helpers.ValidationNew()
 	helpers.ValidationForTicketSubject(v, "subject", args.Subject)
 	helpers.ValidationForTicketContent(v, "content", args.Content)
+	helpers.ValidationForTicketExtendField(v, args.Extend)
 
 	CheckValidation(v)
 
@@ -180,11 +183,8 @@ func (this *TicketModule) ticketAdd(c web.C, w http.ResponseWriter, r *http.Requ
 }
 
 func (this *TicketModule) ticketMakerForAnonym(user *models.User, args *TicketAddArgs, v *validation.Validation, logger *gojimiddleware.XLogger) *models.Ticket {
-	// 需要 email; 不可设置 status, isPublic; extend 受限
-	extend := helpers.TicketParseExtendFromPreSet(args.Extend)
-
+	// 需要 email; 不可设置 status, isPublic;
 	helpers.ValidationForEmail(v, "email", args.Email)
-	helpers.ValidationForTicketExtendField(v, extend)
 
 	CheckValidation(v)
 
@@ -195,27 +195,19 @@ func (this *TicketModule) ticketMakerForAnonym(user *models.User, args *TicketAd
 		return nil
 	}
 
-	return helpers.TicketNewWithChannelName(creator, args.Channel, args.Subject, args.Content, extend)
+	return helpers.TicketNewWithChannelName(creator, args.Channel, args.Subject, args.Content, args.Extend)
 }
 
 func (this *TicketModule) ticketMakerForClient(user *models.User, args *TicketAddArgs, v *validation.Validation, logger *gojimiddleware.XLogger) *models.Ticket {
-	// 不需要 email; 不可设置 status; extend 受限
-	extend := helpers.TicketParseExtendFromPreSet(args.Extend)
-
-	helpers.ValidationForTicketExtendField(v, extend)
-
-	CheckValidation(v)
-
-	ticket := helpers.TicketNewWithChannelName(user, args.Channel, args.Subject, args.Content, extend)
+	// 不需要 email; 不可设置 status;
+	ticket := helpers.TicketNewWithChannelName(user, args.Channel, args.Subject, args.Content, args.Extend)
 	ticket.IsPublic = args.IsPublic
 	return ticket
 }
 
 func (this *TicketModule) ticketMakerForAgent(user *models.User, args *TicketAddArgs, v *validation.Validation, logger *gojimiddleware.XLogger) *models.Ticket {
-	// 需要 email; extend 不受限
-
+	// 需要 email;
 	helpers.ValidationForEmail(v, "email", args.Email)
-	helpers.ValidationForTicketExtendField(v, args.Extend)
 	helpers.ValidationForTicketStatusOnCreate(v, "status", args.Status)
 
 	CheckValidation(v)

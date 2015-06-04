@@ -46,4 +46,6 @@ var (
 
 	ErrCommentNotFound     = jsonutils.NewAPIError(http.StatusNotFound, 110401, "comment not found")
 	ErrCommentUnchangeable = jsonutils.NewAPIError(http.StatusForbidden, 110402, "comment unchangeable")
+
+	ErrUserNotFound = jsonutils.NewAPIError(http.StatusNotFound, 110501, "user not found")
 )

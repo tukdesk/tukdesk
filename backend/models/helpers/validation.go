@@ -3,6 +3,8 @@ package helpers
 import (
 	"fmt"
 
+	"github.com/tukdesk/tukdesk/backend/models"
+
 	"github.com/tukdesk/httputils/validation"
 )
 
@@ -49,6 +51,16 @@ func ValidationForUserAvatar(v *validation.Validation, key, avatar string) *vali
 	return v
 }
 
+func ValidationForUserImportance(v *validation.Validation, key string, importance models.TypeUserImportance) *validation.Validation {
+	v.In(key, importance, UserImportanceOptions)
+	return v
+}
+
+func ValidationForUserListSort(v *validation.Validation, key, sort string) *validation.Validation {
+	v.In(key, sort, UserSortOptionsForList)
+	return v
+}
+
 // ticket
 func ValidationForTicketSubject(v *validation.Validation, key, subject string) *validation.Validation {
 	v.Required(key, subject)
@@ -71,6 +83,11 @@ func ValidationForTicketExtendField(v *validation.Validation, extend map[string]
 
 func ValidationForTicketStatusOnCreate(v *validation.Validation, key, status string) *validation.Validation {
 	v.In(key, status, TicketStatusOptionsForCreate)
+	return v
+}
+
+func ValidationForTicektListSort(v *validation.Validation, key, sort string) *validation.Validation {
+	v.In(key, sort, TicketSortOptionsForList)
 	return v
 }
 

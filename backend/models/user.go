@@ -85,3 +85,12 @@ func (this *User) FindAndModify(query, change map[string]interface{}) error {
 func (this *User) FindOrInsert(query map[string]interface{}, doc *User) (bool, error) {
 	return FindOrInsert(UserCollectionName, query, doc, this)
 }
+
+func (this *User) Count(query map[string]interface{}) (int, error) {
+	return Count(UserCollectionName, query)
+}
+
+func (this *User) List(query map[string]interface{}, start, limit int, sort []string) ([]*User, error) {
+	list := make([]*User, 0, listCap)
+	return list, List(UserCollectionName, query, start, limit, sort, &list)
+}
