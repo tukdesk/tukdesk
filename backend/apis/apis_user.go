@@ -19,7 +19,7 @@ type UserModule struct {
 	cfg config.Config
 }
 
-func RegisterClientModule(cfg config.Config, app *web.Mux) *web.Mux {
+func RegisterUserModule(cfg config.Config, app *web.Mux) *web.Mux {
 	m := UserModule{
 		cfg: cfg,
 	}

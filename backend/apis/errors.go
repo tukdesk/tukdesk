@@ -48,4 +48,9 @@ var (
 	ErrCommentUnchangeable = jsonutils.NewAPIError(http.StatusForbidden, 110402, "comment unchangeable")
 
 	ErrUserNotFound = jsonutils.NewAPIError(http.StatusNotFound, 110501, "user not found")
+
+	ErrFocusNotFound       = jsonutils.NewAPIError(http.StatusNotFound, 110601, "focus not found")
+	ErrFocusAlreadyHandled = jsonutils.NewAPIError(http.StatusBadRequest, 110602, "focus already handled")
+
+	ErrResourceNotFound = jsonutils.NewAPIError(http.StatusNotFound, 110701, "resource not found")
 )

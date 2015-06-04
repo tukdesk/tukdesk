@@ -2,6 +2,8 @@ package apis
 
 import (
 	"github.com/tukdesk/tukdesk/backend/models"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 // base
@@ -41,4 +43,13 @@ type TicketAddArgs struct {
 type CommentAddArgs struct {
 	Type    string `json:"type"`
 	Content string `json:"content"`
+}
+
+// focus
+type FocusAddArgs struct {
+	Priority     models.TypePriority `json:"priority"`
+	Message      string              `json:"message"`
+	ResourceType string              `json:"resourceType"`
+	ResourceId   bson.ObjectId       `json:"resourceId"`
+	Duration     int64               `json:"duration"`
 }

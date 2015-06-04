@@ -18,14 +18,14 @@ var (
 )
 
 type Comment struct {
-	Id          bson.ObjectId `json:"id" bson:"_id"`
-	TicketId    bson.ObjectId `json:"-" bson:"ticketId"`
-	CreatorId   bson.ObjectId `json:"-" bson:"creatorId"`
-	Type        string        `json:"type" bson:"type"`
-	Content     string        `json:"content" bson:"content"`
-	Created     int64         `json:"created" bson:"created"`
-	Updated     int64         `json:"updated" bson:"updated"`
-	Attachments []*Attachment `json:"attachmente" bson:"attachments"`
+	Id          bson.ObjectId   `json:"id" bson:"_id"`
+	TicketId    bson.ObjectId   `json:"-" bson:"ticketId"`
+	CreatorId   bson.ObjectId   `json:"-" bson:"creatorId"`
+	Type        string          `json:"type" bson:"type"`
+	Content     string          `json:"content" bson:"content"`
+	Created     int64           `json:"created" bson:"created"`
+	Updated     int64           `json:"updated" bson:"updated"`
+	Attachments []bson.ObjectId `json:"attachmente" bson:"attachments"`
 }
 
 func NewComment(ticketId, creatorId bson.ObjectId, typ, content string) *Comment {
@@ -43,6 +43,10 @@ func NewComment(ticketId, creatorId bson.ObjectId, typ, content string) *Comment
 
 func (this *Comment) Insert() error {
 	return Insert(CommentCollectionName, this)
+}
+
+func (this *Comment) FindById(id interface{}) error {
+	return FindById(CommentCollectionName, id, this)
 }
 
 func (this *Comment) FindOne(query map[string]interface{}) error {

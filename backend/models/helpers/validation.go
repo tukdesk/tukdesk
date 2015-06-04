@@ -6,6 +6,11 @@ import (
 	"github.com/tukdesk/tukdesk/backend/models"
 
 	"github.com/tukdesk/httputils/validation"
+	"gopkg.in/mgo.v2/bson"
+)
+
+const (
+	msgForFocusResourceId = "is expected to be an ObjectId"
 )
 
 func ValidationNew() *validation.Validation {
@@ -81,8 +86,18 @@ func ValidationForTicketExtendField(v *validation.Validation, extend map[string]
 	return v
 }
 
+func ValidationForTicketPriority(v *validation.Validation, key string, priority models.TypePriority) *validation.Validation {
+	v.In(key, priority, TicketPriorityOptions)
+	return v
+}
+
 func ValidationForTicketStatusOnCreate(v *validation.Validation, key, status string) *validation.Validation {
 	v.In(key, status, TicketStatusOptionsForCreate)
+	return v
+}
+
+func ValidationForTicketStatusOnUpdate(v *validation.Validation, key, status string) *validation.Validation {
+	v.In(key, status, TicketStatusOptionsForUpdate)
 	return v
 }
 
@@ -107,5 +122,34 @@ func ValidationForCommentContent(v *validation.Validation, key, content string) 
 func ValidationForCommentTypeOnUpdate(v *validation.Validation, key, typeName string) *validation.Validation {
 	v.Required(key, typeName)
 	v.In(key, typeName, CommentTypeOptionsForUpdate)
+	return v
+}
+
+// resource
+func ValidationForFocusResourceId(v *validation.Validation, key string, resourceId bson.ObjectId) *validation.Validation {
+	if IsEmptyId(resourceId) {
+		v.AddError(key, msgForFocusResourceId)
+	}
+	return v
+}
+
+func ValidationForFocusResourceType(v *validation.Validation, key, resourceType string) *validation.Validation {
+	v.In(key, resourceType, ResourceTypeOptions)
+	return v
+}
+
+// focus
+func ValidationForFoucsMessage(v *validation.Validation, key, message string) *validation.Validation {
+	v.MaxSize(key, message, FocusMessageMaxLength)
+	return v
+}
+
+func ValidationForFocusPriority(v *validation.Validation, key string, priority models.TypePriority) *validation.Validation {
+	v.In(key, priority, FocusPriorityOptions)
+	return v
+}
+
+func ValidationForFocusStatusOnList(v *validation.Validation, key, status string) *validation.Validation {
+	v.In(key, status, FocusStatusOptionForList)
 	return v
 }

@@ -31,6 +31,11 @@ func CommentInsertForTicket(ticket *models.Ticket, creator *models.User, typ, co
 	return comment, comment.Insert()
 }
 
+func CommentFindById(commentId interface{}) (*models.Comment, error) {
+	comment := &models.Comment{}
+	return comment, comment.FindById(commentId)
+}
+
 func CommentFindByTicketIdAndCommentId(ticketId, commentId interface{}) (*models.Comment, error) {
 	query := M{
 		"_id":      commentId,

@@ -314,7 +314,7 @@ func (this *TicketModule) ticketUpdate(c web.C, w http.ResponseWriter, r *http.R
 				break
 			}
 
-			v.In("priority", priority, helpers.TicketPriorityOptions)
+			helpers.ValidationForTicketPriority(v, name, priority)
 			CheckValidation(v)
 
 			setM[name] = priority
@@ -337,7 +337,13 @@ func (this *TicketModule) ticketUpdate(c web.C, w http.ResponseWriter, r *http.R
 				break
 			}
 
-			v.In("status", val, helpers.TicketStatusOptionsForUpdate)
+			status, ok := val.(string)
+			if !ok {
+				abort(ErrorInvalidArgType(name, helpers.JSONTypeNameString))
+				return
+			}
+
+			helpers.ValidationForTicketStatusOnUpdate(v, name, status)
 			CheckValidation(v)
 
 			setM[name] = val

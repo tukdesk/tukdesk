@@ -38,6 +38,8 @@ func main() {
 	apis.RegisterBrandModule(cfg, app.Mux())
 	apis.RegisterProfileModule(cfg, app.Mux())
 	apis.RegisterTicketsModule(cfg, app.Mux())
+	apis.RegisterUserModule(cfg, app.Mux())
+	apis.RegisterFocusModule(cfg, app.Mux())
 
 	app.Mux().Use(gojimiddleware.RequestLogger)
 	app.Mux().Use(gojimiddleware.RequestTimer)
