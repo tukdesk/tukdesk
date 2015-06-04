@@ -34,7 +34,7 @@ func CheckCurrentBrand() {
 func CheckAuthorizedAsAgent(c *web.C, w http.ResponseWriter, r *http.Request) *models.User {
 	user := GetCurrentUser(c, w, r)
 	if !AuthorizedAsAgent(user) {
-		abort(ErrUnauthorized)
+		abort(ErrAgentOnly)
 	}
 	return user
 }
@@ -53,15 +53,24 @@ func CheckValidation(v *validation.Validation) {
 	}
 
 	e := v.Errors()[0]
-	abort(ErrInvaidArgsWithMsg(fmt.Sprintf("%s : %s", e.Key, e.Message)))
+	abort(ErrorInvaidArgsWithMsg(fmt.Sprintf("%s : %s", e.Key, e.Message)))
 	return
 }
 
 func GetJsonArgsFromRequest(r *http.Request, args interface{}) {
 	if err := jsonutils.GetJsonArgsFromRequest(r, args); err != nil {
-		abort(ErrInvalidRequestBodyWithError(err))
+		abort(ErrorInvalidRequestBodyWithError(err))
 		return
 	}
+}
+
+func GetMapArgsFromRequest(r *http.Request) map[string]interface{} {
+	m := map[string]interface{}{}
+	if err := jsonutils.GetJsonArgsFromRequest(r, &m); err != nil {
+		abort(ErrorInvalidRequestBodyWithError(err))
+		return nil
+	}
+	return m
 }
 
 func GetLogger(c *web.C, w http.ResponseWriter, r *http.Request) *gojimiddleware.XLogger {

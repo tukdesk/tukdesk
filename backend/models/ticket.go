@@ -50,6 +50,14 @@ func (this *Ticket) Insert() error {
 	return Insert(TicketCollectionName, this)
 }
 
+func (this *Ticket) FindById(id interface{}) error {
+	return FindById(TicketCollectionName, id, this)
+}
+
+func (this *Ticket) FindAndModify(query, change map[string]interface{}) error {
+	return FindAndModify(TicketCollectionName, query, change, this)
+}
+
 func (this *Ticket) Count(query map[string]interface{}) (int, error) {
 	return Count(TicketCollectionName, query)
 }

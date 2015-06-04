@@ -6,7 +6,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type OutputUserInfo struct {
+type OutputUser struct {
 	Id       bson.ObjectId            `json:"id"`
 	Base     *models.UserBaseInfo     `json:"base,omitempty"`
 	Personal *models.UserPersonalInfo `json:"personal,omitempty"`
@@ -14,8 +14,8 @@ type OutputUserInfo struct {
 	Updated  int64                    `json:"updated,omitempty"`
 }
 
-func OutputUserProfileInfo(user *models.User) *OutputUserInfo {
-	return &OutputUserInfo{
+func OutputUserProfileInfo(user *models.User) *OutputUser {
+	return &OutputUser{
 		Id:       user.Id,
 		Base:     &user.Base,
 		Personal: &user.Personal,
@@ -24,9 +24,18 @@ func OutputUserProfileInfo(user *models.User) *OutputUserInfo {
 	}
 }
 
-func OutputUserBaseInfo(user *models.User) *OutputUserInfo {
-	return &OutputUserInfo{
+func OutputUserBaseInfo(user *models.User) *OutputUser {
+	return &OutputUser{
 		Id:   user.Id,
 		Base: &user.Base,
 	}
+}
+
+func OutputUserBaseInfoByUserId(userId interface{}) (*OutputUser, error) {
+	user, err := UserFindById(userId)
+	if err != nil && !IsNotFound(err) {
+		return nil, err
+	}
+
+	return OutputUserBaseInfo(user), nil
 }

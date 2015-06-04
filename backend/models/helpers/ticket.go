@@ -86,6 +86,16 @@ func TicketNewWithChannelName(creator *models.User, chName, subject, content str
 	return ticket
 }
 
+func TicketFindById(ticketId interface{}) (*models.Ticket, error) {
+	ticket := &models.Ticket{}
+	return ticket, ticket.FindById(ticketId)
+}
+
+func TicketFindAndModify(ticket *models.Ticket, change map[string]interface{}) error {
+	query := M{"_id": ticket.Id}
+	return ticket.FindAndModify(query, change)
+}
+
 func TicketListAfter(query map[string]interface{}, lastId bson.ObjectId, limit int, sort []string) ([]*models.Ticket, error) {
 	if !IsEmptyId(lastId) {
 		if query == nil {

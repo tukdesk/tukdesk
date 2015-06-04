@@ -108,7 +108,7 @@ func (this *BaseModule) signup(c web.C, w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	output := helpers.OutputUserToken(helpers.TokenForUser(user, helpers.CurrentBrand().Authorization.APIKey), helpers.TokenDefaultExpirationSec)
+	output := helpers.OutputUserTokenInfo(helpers.TokenForUser(user, helpers.CurrentBrand().Authorization.APIKey), helpers.TokenDefaultExpirationSec)
 	OutputJson(output, w, r)
 	return
 }

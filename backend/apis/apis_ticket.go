@@ -14,6 +14,7 @@ import (
 
 var (
 	defaultTicketsSort = []string{"-created"}
+	defaultCommentSort = []string{"updated"}
 )
 
 type TicketModule struct {
@@ -28,6 +29,11 @@ func RegisterTicketsModule(cfg config.Config, app *web.Mux) *web.Mux {
 	mux := web.New()
 	mux.Get("", m.ticketList)
 	mux.Post("", m.ticketAdd)
+	mux.Get("/:ticketId", m.ticketProfile)
+	mux.Put("/:ticketId", m.ticketUpdate)
+	mux.Get("/:ticketId/comments", m.commentList)
+	mux.Post("/:ticketId/comments", m.commentAdd)
+	mux.Put("/:ticketId/comments/:commentsId", m.commentUpdate)
 
 	gojimiddleware.RegisterSubroute("/tickets", app, mux)
 	return mux
@@ -86,10 +92,10 @@ func (this *TicketModule) ticketList(c web.C, w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	items := make([]*helpers.OutputTicketInfo, len(tickets))
+	items := make([]*helpers.OutputTicket, len(tickets))
 
 	if len(items) > 0 {
-		var infoParser func(*models.Ticket) (*helpers.OutputTicketInfo, error)
+		var infoParser func(*models.Ticket) (*helpers.OutputTicket, error)
 		if isAgent {
 			infoParser = helpers.OutputTicketDetailInfoForList
 		} else {
@@ -230,26 +236,405 @@ func (this *TicketModule) ticketMakerForAgent(user *models.User, args *TicketAdd
 }
 
 func (this *TicketModule) ticketProfile(c web.C, w http.ResponseWriter, r *http.Request) {
+	user := GetCurrentUser(&c, w, r)
 
+	ticketId, ok := helpers.IdFromString(c.URLParams["ticketId"])
+	if !ok {
+		abort(ErrInvalidId)
+		return
+	}
+
+	logger := GetLogger(&c, w, r)
+
+	ticket, err := helpers.TicketFindById(ticketId)
+	if helpers.IsNotFound(err) {
+		abort(ErrTicketNotFound)
+		return
+	}
+
+	if err != nil {
+		logger.Error(err)
+		abort(ErrInternalError)
+		return
+	}
+
+	showDetail := AuthorizedAsAgent(user) || AuthorizedAsSpecifiedUser(user, ticket.CreatorId)
+	var infoParser func(*models.Ticket) (*helpers.OutputTicket, error)
+	if showDetail {
+		infoParser = helpers.OutputTicketDetailInfo
+	} else {
+		infoParser = helpers.OutputTicketPublicInfo
+	}
+
+	output, err := infoParser(ticket)
+	if err != nil {
+		logger.Error(err)
+		abort(ErrInternalError)
+		return
+	}
+
+	OutputJson(output, w, r)
 	return
 }
 
 func (this *TicketModule) ticketUpdate(c web.C, w http.ResponseWriter, r *http.Request) {
+	// 仅修改工单属性, 不修改内容, 因此不向 client 开放
+	CheckAuthorizedAsAgent(&c, w, r)
 
+	ticketId, ok := helpers.IdFromString(c.URLParams["ticketId"])
+	if !ok {
+		abort(ErrInvalidId)
+		return
+	}
+
+	args := GetMapArgsFromRequest(r)
+
+	logger := GetLogger(&c, w, r)
+
+	ticket, err := helpers.TicketFindById(ticketId)
+	if helpers.IsNotFound(err) {
+		abort(ErrTicketNotFound)
+		return
+	}
+
+	if err != nil {
+		logger.Error(err)
+		abort(ErrInternalError)
+		return
+	}
+
+	setM := helpers.M{}
+	v := helpers.ValidationNew()
+
+	for name, val := range args {
+		switch name {
+		case "priority":
+			priorityStr, ok := val.(string)
+			if !ok {
+				abort(ErrorInvalidArgType(name, helpers.JSONTypeNameString))
+				return
+			}
+
+			priority := models.NewTypePriority(priorityStr)
+
+			// 不先比较, 因为需要将输出值转化为真实值
+			if priority == ticket.Priority {
+				break
+			}
+
+			v.In("priority", priority, helpers.TicketPriorityOptions)
+			CheckValidation(v)
+
+			setM[name] = priority
+
+		case "isPublic":
+			if val == ticket.IsPublic {
+				break
+			}
+
+			isPublic, ok := val.(bool)
+			if !ok {
+				abort(ErrorInvalidArgType(name, helpers.JSONTypeNameBoolen))
+				return
+			}
+
+			setM[name] = isPublic
+
+		case "status":
+			if val == ticket.Status {
+				break
+			}
+
+			v.In("status", val, helpers.TicketStatusOptionsForUpdate)
+			CheckValidation(v)
+
+			setM[name] = val
+
+		}
+	}
+
+	if len(setM) > 0 {
+		setM["updated"] = NowUnix()
+
+		err := helpers.TicketFindAndModify(ticket, ChangeSetM(setM))
+		if helpers.IsNotFound(err) {
+			abort(ErrTicketNotFound)
+			return
+		}
+
+		if err != nil {
+			logger.Error(err)
+			abort(ErrInternalError)
+			return
+		}
+	}
+
+	output, err := helpers.OutputTicketDetailInfo(ticket)
+	if err != nil {
+		logger.Error(err)
+		abort(ErrInternalError)
+		return
+	}
+
+	OutputJson(output, w, r)
 	return
 }
 
 func (this *TicketModule) commentList(c web.C, w http.ResponseWriter, r *http.Request) {
+	user := GetCurrentUser(&c, w, r)
 
+	ticketId, ok := helpers.IdFromString(c.URLParams["ticketId"])
+	if !ok {
+		abort(ErrInvalidId)
+		return
+	}
+
+	logger := GetLogger(&c, w, r)
+
+	ticket, err := helpers.TicketFindById(ticketId)
+	if helpers.IsNotFound(err) {
+		abort(ErrTicketNotFound)
+		return
+	}
+
+	if err != nil {
+		logger.Error(err)
+		abort(ErrInternalError)
+		return
+	}
+
+	// 非公开 ticket, agent 或 题主可见
+	if !ticket.IsPublic && !AuthorizedAsAgent(user) && !AuthorizedAsSpecifiedUser(user, ticket.CreatorId) {
+		abort(ErrUnauthorized)
+		return
+	}
+
+	// 游客可见: public, question, feedback
+	// 题主可见: public, question, feedback
+	// agent 可见: all
+	query := helpers.M{}
+	if !AuthorizedAsAgent(user) {
+		query["type"] = helpers.M{"$in": helpers.CommentTypeOptionsForNonAgentView}
+	}
+
+	comments, err := helpers.CommentFindAllByTicketId(ticket.Id, query, defaultCommentSort)
+	if err != nil {
+		logger.Error(err)
+		abort(ErrInternalError)
+		return
+	}
+
+	items := make([]*helpers.OutputComment, len(comments))
+
+	if len(items) > 0 {
+		for i, comment := range comments {
+			info, err := helpers.OutputCommentInfo(comment)
+			if err != nil {
+				logger.Error(err)
+				abort(ErrInternalError)
+				return
+			}
+			items[i] = info
+		}
+	}
+
+	OutputJson(ListResultNew(len(items), items), w, r)
 	return
 }
 
 func (this *TicketModule) commentAdd(c web.C, w http.ResponseWriter, r *http.Request) {
+	user := CheckAuthorizedLogged(&c, w, r)
 
+	ticketId, ok := helpers.IdFromString(c.URLParams["ticketId"])
+	if !ok {
+		abort(ErrInvalidId)
+		return
+	}
+
+	args := &CommentAddArgs{}
+	GetJsonArgsFromRequest(r, args)
+
+	v := helpers.ValidationNew()
+	helpers.ValidationForCommentTypeOnCreate(v, "type", args.Type)
+	helpers.ValidationForCommentContent(v, "content", args.Content)
+	CheckValidation(v)
+
+	switch args.Type {
+	case models.CommentTypePublic, models.CommentTypeInternal:
+		if !AuthorizedAsAgent(user) {
+			abort(ErrUnauthorized)
+			return
+		}
+	}
+
+	logger := GetLogger(&c, w, r)
+
+	ticket, err := helpers.TicketFindById(ticketId)
+	if helpers.IsNotFound(err) {
+		abort(ErrTicketNotFound)
+		return
+	}
+
+	if err != nil {
+		logger.Error(err)
+		abort(ErrInternalError)
+		return
+	}
+
+	if !AuthorizedAsAgent(user) && !AuthorizedAsSpecifiedUser(user, ticket.CreatorId) {
+		abort(ErrUnauthorized)
+		return
+	}
+
+	comment, err := helpers.CommentInsertForTicket(ticket, user, args.Type, args.Content)
+	if err != nil {
+		logger.Error(err)
+		abort(ErrInternalError)
+		return
+	}
+
+	ticketSetM := helpers.M{}
+	if args.Type == models.CommentTypeFeedback {
+		ticketSetM["status"] = models.TicketStatusResubmitted
+	} else if args.Type == models.CommentTypePublic {
+		ticketSetM["status"] = models.TicketStatusReplied
+		if ticket.FirstCommented == 0 {
+			ticketSetM["firstCommented"] = NowUnix()
+		}
+	}
+
+	if len(ticketSetM) > 0 {
+		ticketSetM["updated"] = NowUnix()
+		if err := helpers.TicketFindAndModify(ticket, ChangeSetM(ticketSetM)); err != nil {
+			logger.Error(err)
+			abort(ErrInternalError)
+			return
+		}
+	}
+
+	output, err := helpers.OutputCommentInfo(comment)
+	if err != nil {
+		logger.Error(err)
+		abort(ErrInternalError)
+		return
+	}
+
+	OutputJson(output, w, r)
 	return
 }
 
 func (this *TicketModule) commentUpdate(c web.C, w http.ResponseWriter, r *http.Request) {
+	// 当 comment 类型为 internal 时, 可以修改内容, 或将类型修改为 public
+	CheckAuthorizedAsAgent(&c, w, r)
+
+	ticketId, ok := helpers.IdFromString(c.URLParams["ticketId"])
+	if !ok {
+		abort(ErrInvalidId)
+		return
+	}
+
+	commentId, ok := helpers.IdFromString(c.URLParams["commentId"])
+	if !ok {
+		abort(ErrInvalidId)
+		return
+	}
+
+	args := GetMapArgsFromRequest(r)
+
+	// get ticket and comment
+	logger := GetLogger(&c, w, r)
+
+	ticket, err := helpers.TicketFindById(ticketId)
+	if helpers.IsNotFound(err) {
+		abort(ErrTicketNotFound)
+		return
+	}
+
+	if err != nil {
+		logger.Error(err)
+		abort(ErrInternalError)
+		return
+	}
+
+	comment, err := helpers.CommentFindByTicketIdAndCommentId(ticketId, commentId)
+	if helpers.IsNotFound(err) {
+		abort(ErrCommentNotFound)
+		return
+	}
+
+	if err != nil {
+		logger.Error(err)
+		abort(ErrInternalError)
+		return
+	}
+
+	// 非 internal 的 comment, 不可修改
+	if comment.Type != models.CommentTypeInternal {
+		abort(ErrCommentUnchangeable)
+		return
+	}
+
+	v := helpers.ValidationNew()
+
+	commentSetM := helpers.M{}
+	ticketSetM := helpers.M{}
+
+	for name, val := range args {
+		switch name {
+		case "type":
+			if val == comment.Type {
+				break
+			}
+
+			commentType, ok := val.(string)
+			if !ok {
+				abort(ErrorInvalidArgType(name, helpers.JSONTypeNameString))
+				return
+			}
+
+			helpers.ValidationForCommentTypeOnUpdate(v, name, commentType)
+			CheckValidation(v)
+
+			commentSetM[name] = commentType
+			// 假装我们不知道 Update 时 只允许 CommentTypePublic 一种
+			if commentType == models.CommentTypePublic {
+				ticketSetM["status"] = models.TicketStatusReplied
+			}
+
+		case "content":
+			if val == comment.Content {
+				break
+			}
+
+			content, ok := val.(string)
+			if !ok {
+				abort(ErrorInvalidArgType(name, helpers.JSONTypeNameString))
+				return
+			}
+
+			commentSetM[name] = content
+		}
+	}
+
+	now := NowUnix()
+
+	if len(ticketSetM) > 0 {
+		ticketSetM["updated"] = now
+		if err := helpers.TicketFindAndModify(ticket, ChangeSetM(ticketSetM)); err != nil {
+			logger.Error(err)
+			abort(ErrInternalError)
+			return
+		}
+	}
+
+	if len(commentSetM) > 0 {
+		commentSetM["updated"] = now
+		if err := helpers.CommentFindAndModify(comment, ChangeSetM(commentSetM)); err != nil {
+			logger.Error(err)
+			abort(ErrInternalError)
+			return
+		}
+	}
 
 	return
 }

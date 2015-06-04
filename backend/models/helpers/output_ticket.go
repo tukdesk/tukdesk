@@ -6,9 +6,9 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type OutputTicketInfo struct {
+type OutputTicket struct {
 	Id       bson.ObjectId       `json:"id"`
-	Creator  *OutputUserInfo     `json:"creator"`
+	Creator  *OutputUser         `json:"creator"`
 	Channel  *models.ChannelInfo `json:"channel,omitempty"`
 	Subject  string              `json:"subject"`
 	Content  string              `json:"content"`
@@ -17,19 +17,19 @@ type OutputTicketInfo struct {
 	Created  int64               `json:"created"`
 	Updated  int64               `json:"updated"`
 	Status   string              `json:"status"`
-	Rank     int                 `json:"rank"`
+	Rank     int                 `json:"rank,omitempty"`
 	Extend   map[string]string   `json:"extend,omitempty"`
 }
 
-func OutputTicketPublicInfo(ticket *models.Ticket) (*OutputTicketInfo, error) {
-	user, err := UserFindById(ticket.CreatorId)
-	if err != nil && !IsNotFound(err) {
+func OutputTicketPublicInfo(ticket *models.Ticket) (*OutputTicket, error) {
+	creator, err := OutputUserBaseInfoByUserId(ticket.CreatorId)
+	if err != nil {
 		return nil, err
 	}
 
-	output := &OutputTicketInfo{}
+	output := &OutputTicket{}
 	output.Id = ticket.Id
-	output.Creator = OutputUserBaseInfo(user)
+	output.Creator = creator
 
 	output.Channel = &ticket.Channel
 	output.Subject = ticket.Subject
@@ -42,15 +42,40 @@ func OutputTicketPublicInfo(ticket *models.Ticket) (*OutputTicketInfo, error) {
 	return output, nil
 }
 
-func OutputTicketPublicInfoForList(ticket *models.Ticket) (*OutputTicketInfo, error) {
-	user, err := UserFindById(ticket.CreatorId)
-	if err != nil && !IsNotFound(err) {
+func OutputTicketDetailInfo(ticket *models.Ticket) (*OutputTicket, error) {
+	creator, err := OutputUserBaseInfoByUserId(ticket.CreatorId)
+	if err != nil {
 		return nil, err
 	}
 
-	output := &OutputTicketInfo{}
+	output := &OutputTicket{}
 	output.Id = ticket.Id
-	output.Creator = OutputUserBaseInfo(user)
+	output.Creator = creator
+
+	output.Channel = &ticket.Channel
+	output.Subject = ticket.Subject
+	output.Content = ticket.Content
+	output.IsPublic = ticket.IsPublic
+	output.Created = ticket.Created
+	output.Updated = ticket.Updated
+	output.Status = ticket.Status
+
+	output.Priority = ticket.Priority
+	output.Rank = ticket.Rank
+	output.Extend = ticket.Extend
+
+	return output, nil
+}
+
+func OutputTicketPublicInfoForList(ticket *models.Ticket) (*OutputTicket, error) {
+	creator, err := OutputUserBaseInfoByUserId(ticket.CreatorId)
+	if err != nil {
+		return nil, err
+	}
+
+	output := &OutputTicket{}
+	output.Id = ticket.Id
+	output.Creator = creator
 
 	output.Channel = &ticket.Channel
 	output.Subject = ticket.Subject
@@ -62,22 +87,24 @@ func OutputTicketPublicInfoForList(ticket *models.Ticket) (*OutputTicketInfo, er
 	return output, nil
 }
 
-func OutputTicketDetailInfoForList(ticket *models.Ticket) (*OutputTicketInfo, error) {
-	user, err := UserFindById(ticket.CreatorId)
-	if err != nil && !IsNotFound(err) {
+func OutputTicketDetailInfoForList(ticket *models.Ticket) (*OutputTicket, error) {
+	creator, err := OutputUserBaseInfoByUserId(ticket.CreatorId)
+	if err != nil {
 		return nil, err
 	}
 
-	output := &OutputTicketInfo{}
+	output := &OutputTicket{}
 	output.Id = ticket.Id
-	output.Creator = OutputUserBaseInfo(user)
+	output.Creator = creator
 
 	output.Channel = &ticket.Channel
 	output.Subject = ticket.Subject
-	output.Priority = ticket.Priority
 	output.IsPublic = ticket.IsPublic
 	output.Created = ticket.Created
 	output.Updated = ticket.Updated
 	output.Status = ticket.Status
+
+	output.Priority = ticket.Priority
+
 	return output, nil
 }

@@ -36,3 +36,9 @@ type TicketAddArgs struct {
 	IsPublic bool              `json:"isPublic,omitempty"`
 	Extend   map[string]string `json:"extend"`
 }
+
+// comment
+type CommentAddArgs struct {
+	Type    string `json:"type"`
+	Content string `json:"content"`
+}

@@ -73,3 +73,22 @@ func ValidationForTicketStatusOnCreate(v *validation.Validation, key, status str
 	v.In(key, status, TicketStatusOptionsForCreate)
 	return v
 }
+
+// comment
+func ValidationForCommentTypeOnCreate(v *validation.Validation, key, typeName string) *validation.Validation {
+	v.Required(key, typeName)
+	v.In(key, typeName, CommentTypeOptionsForCreate)
+	return v
+}
+
+func ValidationForCommentContent(v *validation.Validation, key, content string) *validation.Validation {
+	v.Required(key, content)
+	v.MinSize(key, content, CommentContentMinLength)
+	return v
+}
+
+func ValidationForCommentTypeOnUpdate(v *validation.Validation, key, typeName string) *validation.Validation {
+	v.Required(key, typeName)
+	v.In(key, typeName, CommentTypeOptionsForUpdate)
+	return v
+}
