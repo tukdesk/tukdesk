@@ -9,6 +9,7 @@ import (
 
 	"github.com/tukdesk/httputils/gojimiddleware"
 	"github.com/tukdesk/mgoutils"
+	"github.com/zenazn/goji/web"
 )
 
 func main() {
@@ -32,20 +33,22 @@ func main() {
 	}
 
 	// init app
-	app := gojimiddleware.NewApp()
+	app := web.New()
+	apis.RegisterBaseModule(cfg, app)
+	apis.RegisterBrandModule(cfg, app)
+	apis.RegisterProfileModule(cfg, app)
+	apis.RegisterTicketsModule(cfg, app)
+	apis.RegisterUserModule(cfg, app)
+	apis.RegisterFocusModule(cfg, app)
 
-	apis.RegisterBaseModule(cfg, app.Mux())
-	apis.RegisterBrandModule(cfg, app.Mux())
-	apis.RegisterProfileModule(cfg, app.Mux())
-	apis.RegisterTicketsModule(cfg, app.Mux())
-	apis.RegisterUserModule(cfg, app.Mux())
-	apis.RegisterFocusModule(cfg, app.Mux())
+	service := gojimiddleware.NewApp()
+	service.Mux().Use(gojimiddleware.RequestLogger)
+	service.Mux().Use(gojimiddleware.RequestTimer)
+	service.Mux().Use(gojimiddleware.RecovererJson)
 
-	app.Mux().Use(gojimiddleware.RequestLogger)
-	app.Mux().Use(gojimiddleware.RequestTimer)
-	app.Mux().Use(gojimiddleware.RecovererJson)
+	gojimiddleware.RegisterSubroute("/apis/v1", service.Mux(), app)
 
-	if err := app.Run(cfg.Addr); err != nil {
+	if err := service.Run(cfg.Addr); err != nil {
 		log.Fatalln(err)
 	}
 }
