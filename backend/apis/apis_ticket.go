@@ -29,7 +29,7 @@ func RegisterTicketsModule(cfg config.Config, app *web.Mux) *web.Mux {
 	mux := web.New()
 	mux.Get("", m.ticketList)
 	mux.Post("", m.ticketAdd)
-	mux.Get("/:ticketId", m.ticketProfile)
+	mux.Get("/:ticketId", m.ticketInfo)
 	mux.Put("/:ticketId", m.ticketUpdate)
 	mux.Get("/:ticketId/comments", m.commentList)
 	mux.Post("/:ticketId/comments", m.commentAdd)
@@ -227,7 +227,7 @@ func (this *TicketModule) ticketMakerForAgent(user *models.User, args *TicketAdd
 	return ticket
 }
 
-func (this *TicketModule) ticketProfile(c web.C, w http.ResponseWriter, r *http.Request) {
+func (this *TicketModule) ticketInfo(c web.C, w http.ResponseWriter, r *http.Request) {
 	user := GetCurrentUser(&c, w, r)
 
 	ticketId, ok := helpers.IdFromString(c.URLParams["ticketId"])

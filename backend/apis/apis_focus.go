@@ -27,7 +27,7 @@ func RegisterFocusModule(cfg config.Config, app *web.Mux) *web.Mux {
 	mux := web.New()
 	mux.Get("", m.focusList)
 	mux.Post("", m.focusAdd)
-	mux.Put("/:focusId", m.focusHandled)
+	mux.Put("/:focusId", m.focusHandle)
 
 	gojimiddleware.RegisterSubroute("/focus", app, mux)
 	return mux
@@ -105,7 +105,7 @@ func (this *FocusModule) focusAdd(c web.C, w http.ResponseWriter, r *http.Reques
 	return
 }
 
-func (this *FocusModule) focusHandled(c web.C, w http.ResponseWriter, r *http.Request) {
+func (this *FocusModule) focusHandle(c web.C, w http.ResponseWriter, r *http.Request) {
 	CheckAuthorizedAsAgent(&c, w, r)
 
 	focusId, ok := helpers.IdFromString(c.URLParams["focusId"])
