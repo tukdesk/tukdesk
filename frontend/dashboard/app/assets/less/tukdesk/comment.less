@@ -1,0 +1,62 @@
+.tuk-comment {
+  margin: 20px 0;
+
+  .tuk-name-panel {
+    position: relative;
+    padding-left: 20px;
+    z-index: 99;
+  }
+
+  .tuk-comment-body {
+    background-color: #E8EAF6;
+    border-radius: 2px;
+    margin-top: -24px;
+    padding: 44px 20px;
+    position: relative;
+
+    .tuk-comment-time {
+      position: absolute;
+      right: 20px;
+      top: -7px;
+    }
+  }
+
+  &.tuk-comment-type-public {
+    .tuk-comment-body {
+      background-color: #E8F5E9;
+    }
+  }
+
+  &.tuk-comment-type-internal {
+    .tuk-comment-body {
+      background-color: #E3F2FD;
+    }
+  }
+
+  .tuk-comment-buttons {
+    margin-top: 10px;
+    text-align: right;
+
+    .tuk-comment-btn {
+      height: 20px;
+      line-height: 20px;
+      margin-left: 20px;
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      color: @tuk-theme-black-secondary-text;
+
+      i {
+        color: @tuk-theme-black-secondary-text;
+      }
+
+      &:hover {
+        color: @tuk-theme-black-text;
+
+        i {
+          color: @tuk-theme-black-text;
+        };
+      }
+    }
+  }
+}
