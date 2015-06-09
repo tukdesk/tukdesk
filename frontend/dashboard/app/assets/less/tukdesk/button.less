@@ -3,26 +3,133 @@
   min-width: 80px;
   height: 34px;
   text-align: center;
-  border: 1px solid @tuk-theme-dark-border;
-  color: @tuk-theme-dark-text;
   font-size: 14px;
   line-height: 34px;
   padding: 0 12px;
   display: inline-block;
-  background-color: #FFFFFF;
+  border: 1px solid @tuk-theme-dark-border;
 
   &:hover {
-    background-color: #f5f5f5;
     cursor: pointer;
   }
 
   &.disabled {
-    color: @tuk-theme-black-disabled;
-    border: 1px solid #E0E0E0;
 
     &:hover {
       cursor: default;
-      background-color: #FFFFFF;
+    }
+  }
+
+  &.tuk-btn-default {
+    color: @tuk-theme-dark-text;
+    background-color: @tuk-theme-white;
+
+    &:hover {
+      background-color: @tuk-theme-grey-100;
+    }
+
+    &.disabled {
+      color: @tuk-theme-black-disabled;
+      border: 1px solid @tuk-theme-grey-300;
+
+      &:hover {
+        background-color: @tuk-theme-white;
+      }
+    }
+  }
+
+  &.tuk-btn-primary {
+    border-color: @tuk-theme-indigo-700;
+    color: @tuk-theme-white-text;
+    background-color: @tuk-theme-indigo-400;
+
+    &:hover {
+      background-color: @tuk-theme-indigo-700;
+    }
+
+    &.disabled {
+      color: @tuk-theme-white-secondary-text;
+      background-color: @tuk-theme-indigo-300;
+
+      &:hover {
+        background-color: @tuk-theme-indigo-300;
+      }
+    }
+  }
+
+  &.tuk-btn-info {
+    border-color: @tuk-theme-blue-600;
+    color: @tuk-theme-white-text;
+    background-color: @tuk-theme-blue-300;
+
+    &:hover {
+      background-color: @tuk-theme-blue-600;
+    }
+
+    &.disabled {
+      color: @tuk-theme-white-secondary-text;
+      background-color: @tuk-theme-blue-200;
+
+      &:hover {
+        background-color: @tuk-theme-blue-200;
+      }
+    }
+  }
+
+  &.tuk-btn-success {
+    border-color: @tuk-theme-green-600;
+    color: @tuk-theme-white-text;
+    background-color: @tuk-theme-green-400;
+
+    &:hover {
+      background-color: @tuk-theme-green-600;
+    }
+
+    &.disabled {
+      color: @tuk-theme-white-secondary-text;
+      background-color: @tuk-theme-green-300;
+
+      &:hover {
+        background-color: @tuk-theme-green-300;
+      }
+    }
+  }
+
+  &.tuk-btn-warning {
+    border-color: @tuk-theme-orange-700;
+    color: @tuk-theme-white-text;
+    background-color: @tuk-theme-orange-400;
+
+    &:hover {
+      background-color: @tuk-theme-orange-700;
+    }
+
+    &.disabled {
+      color: @tuk-theme-white-secondary-text;
+      background-color: @tuk-theme-orange-300;
+
+      &:hover {
+        background-color: @tuk-theme-orange-300;
+      }
+    }
+  }
+
+  &.tuk-btn-danger {
+    border-color: @tuk-theme-red-800;
+    color: @tuk-theme-white-text;
+    background-color: @tuk-theme-red-400;
+
+    &:hover {
+      background-color: @tuk-theme-red-800;
+    }
+
+    &.disabled {
+      color: @tuk-theme-white-secondary-text;
+      background-color: @tuk-theme-red-300;
+
+      &:hover {
+        background-color: @tuk-theme-red-300;
+      }
     }
   }
 }
@@ -30,4 +137,38 @@
 .tuk-btn-group {
   position: relative;
   display: inline-block;
+
+  .tuk-btn {
+    float: left;
+
+    &:first-child:not(:last-child):not(.dropdown-toggle) {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    &:last-child:not(:first-child),
+    &.dropdown-toggle:not(:first-child) {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+
+    &:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+      border-radius: 0;
+    }
+
+    &:not(:first-child) {
+      margin-left: -1px;
+    }
+
+    &.dropdown-toggle {
+      width: 26px;
+      min-width: 26px;
+      padding: 0;
+
+      &:before {
+        font-family: FontAwesome;
+        content: "\f0d7";
+      }
+    }
+  }
 }

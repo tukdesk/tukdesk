@@ -1,8 +1,8 @@
 .tuk-corner {
   width: 0;
   height: 0;
-  border-top: 16px solid #9e9e9e;
-  border-right: 16px solid #9e9e9e;
+  border-top: 16px solid @tuk-theme-grey-500;
+  border-right: 16px solid @tuk-theme-grey-500;
   border-bottom: 16px solid transparent;
   border-left: 16px solid transparent;
   position: absolute;
@@ -16,22 +16,27 @@
   }
 
   &.tuk-corner-info {
-    border-top: 16px solid #64B5F6;
-    border-right: 16px solid #64B5F6;
+    border-top: 16px solid @tuk-theme-blue-300;
+    border-right: 16px solid @tuk-theme-blue-300;
+  }
+
+  &.tuk-corner-primary {
+    border-top: 16px solid @tuk-theme-indigo-600;
+    border-right: 16px solid @tuk-theme-indigo-600;
   }
 
   &.tuk-corner-success {
-    border-top: 16px solid #66BB6A;
-    border-right: 16px solid #66BB6A;
+    border-top: 16px solid @tuk-theme-green-400;
+    border-right: 16px solid @tuk-theme-green-400;
   }
 
   &.tuk-corner-warning {
-    border-top: 16px solid #FFB74D;
-    border-right: 16px solid #FFB74D;
+    border-top: 16px solid @tuk-theme-orange-300;
+    border-right: 16px solid @tuk-theme-orange-300;
   }
 
   &.tuk-corner-danger {
-    border-top: 16px solid #EF5350;
-    border-right: 16px solid #EF5350;
+    border-top: 16px solid @tuk-theme-red-400;
+    border-right: 16px solid @tuk-theme-red-400;
   }
 }
