@@ -1,8 +1,15 @@
+@tuk-corner-default: @tuk-theme-grey-500;
+@tuk-corner-info: @tuk-theme-blue-300;
+@tuk-corner-primary: @tuk-theme-indigo-600;
+@tuk-corner-success: @tuk-theme-green-400;
+@tuk-corner-warning: @tuk-theme-orange-300;
+@tuk-corner-danger: @tuk-theme-red-400;
+
 .tuk-corner {
   width: 0;
   height: 0;
-  border-top: 16px solid @tuk-theme-grey-500;
-  border-right: 16px solid @tuk-theme-grey-500;
+  border-top: 16px solid @tuk-corner-default;
+  border-right: 16px solid @tuk-corner-default;
   border-bottom: 16px solid transparent;
   border-left: 16px solid transparent;
   position: absolute;
@@ -16,27 +23,27 @@
   }
 
   &.tuk-corner-info {
-    border-top: 16px solid @tuk-theme-blue-300;
-    border-right: 16px solid @tuk-theme-blue-300;
+    border-top: 16px solid @tuk-corner-info;
+    border-right: 16px solid @tuk-corner-info;
   }
 
   &.tuk-corner-primary {
-    border-top: 16px solid @tuk-theme-indigo-600;
-    border-right: 16px solid @tuk-theme-indigo-600;
+    border-top: 16px solid @tuk-corner-primary;
+    border-right: 16px solid @tuk-corner-primary;
   }
 
   &.tuk-corner-success {
-    border-top: 16px solid @tuk-theme-green-400;
-    border-right: 16px solid @tuk-theme-green-400;
+    border-top: 16px solid @tuk-corner-success;
+    border-right: 16px solid @tuk-corner-success;
   }
 
   &.tuk-corner-warning {
-    border-top: 16px solid @tuk-theme-orange-300;
-    border-right: 16px solid @tuk-theme-orange-300;
+    border-top: 16px solid @tuk-corner-warning;
+    border-right: 16px solid @tuk-corner-warning;
   }
 
   &.tuk-corner-danger {
-    border-top: 16px solid @tuk-theme-red-400;
-    border-right: 16px solid @tuk-theme-red-400;
+    border-top: 16px solid @tuk-corner-danger;
+    border-right: 16px solid @tuk-corner-danger;
   }
 }

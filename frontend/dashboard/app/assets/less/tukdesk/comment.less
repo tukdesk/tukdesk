@@ -1,3 +1,9 @@
+@tuk-comment-default-bg: @tuk-theme-indigo-50;
+@tuk-comment-public-bg: @tuk-theme-green-50;
+@tuk-comment-internal-bg: @tuk-theme-blue-50;
+@tuk-comment-btn-text: @tuk-theme-black-secondary-text;
+@tuk-comment-btn-active-text: @tuk-theme-black-text;
+
 .tuk-comment {
   margin: 20px 0;
 
@@ -8,7 +14,7 @@
   }
 
   .tuk-comment-body {
-    background-color: @tuk-theme-indigo-50;
+    background-color: @tuk-comment-default-bg;
     border-radius: 2px;
     margin-top: -24px;
     padding: 44px 20px;
@@ -23,13 +29,13 @@
 
   &.tuk-comment-type-public {
     .tuk-comment-body {
-      background-color: @tuk-theme-green-50;
+      background-color: @tuk-comment-public-bg;
     }
   }
 
   &.tuk-comment-type-internal {
     .tuk-comment-body {
-      background-color: @tuk-theme-blue-50;
+      background-color: @tuk-comment-internal-bg;
     }
   }
 
@@ -44,17 +50,17 @@
       position: relative;
       display: inline-block;
       cursor: pointer;
-      color: @tuk-theme-black-secondary-text;
+      color: @tuk-comment-btn-text;
 
       i {
-        color: @tuk-theme-black-secondary-text;
+        color: @tuk-comment-btn-text;
       }
 
       &:hover {
-        color: @tuk-theme-black-text;
+        color: @tuk-comment-btn-active-text;
 
         i {
-          color: @tuk-theme-black-text;
+          color: @tuk-comment-btn-active-text;
         };
       }
     }

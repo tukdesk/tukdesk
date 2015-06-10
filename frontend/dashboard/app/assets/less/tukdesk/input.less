@@ -1,15 +1,20 @@
+@tuk-input-border: @tuk-theme-grey-400;
+@tuk-input-bg: @tuk-theme-grey-50;
+@tuk-input-active-border: @tuk-theme-blue-500;
+@tuk-input-active-bg: @tuk-theme-white;
+
 input[type=text],
 input[type=password],
 select {
   height: 34px;
   padding: 0 12px;
-  border: 1px solid @tuk-theme-grey-400;
+  border: 1px solid @tuk-input-border;
   border-radius: 2px;
-  background-color: @tuk-theme-grey-50;
+  background-color: @tuk-input-bg;
 
   &:focus {
     outline: none;
-    border: 1px solid @tuk-theme-blue-500;
-    background-color: @tuk-theme-white;
+    border: 1px solid @tuk-input-active-border;
+    background-color: @tuk-input-active-bg;
   }
 }

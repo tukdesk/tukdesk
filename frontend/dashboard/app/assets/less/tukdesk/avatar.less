@@ -1,16 +1,20 @@
+@tuk-avatar-bg: @tuk-theme-white;
+@tuk-avatar-border: @tuk-sketch-dark-border;
+@tuk-avatar-icon: @tuk-theme-grey-500;
+
 .tuk-avatar {
   display: inline-block;
   width: 48px;
   height: 48px;
   border-radius: 24px;
-  border: 1px solid @tuk-sketch-dark-border;
-  background-color: @tuk-theme-white;
+  border: 1px solid @tuk-avatar-border;
+  background-color: @tuk-avatar-bg;
 
   text-align: center;
 
   &:before {
     font-family: FontAwesome;
-    color: @tuk-theme-grey-500;
+    color: @tuk-avatar-icon;
     font-size: 24px;
     line-height: 44px;
     content: "\f007";

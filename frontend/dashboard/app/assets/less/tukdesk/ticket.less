@@ -1,7 +1,13 @@
+@tuk-ticket-border: @tuk-sketch-dark-border;
+@tuk-ticket-header-bg: @tuk-theme-white;
+@tuk-ticket-comments-bg: @tuk-body-color;
+@tuk-ticket-footer-bg: @tuk-body-color;
+
 .tuk-ticket-header {
   border-radius: 2px 2px 0 0;
   height: 64px;
-  border: 1px solid @tuk-sketch-dark-border;
+  border: 1px solid @tuk-ticket-border;
+  background-color: @tuk-ticket-header-bg;
   font-size: 20px;
   font-weight: 700;
   text-indent: 18px;
@@ -11,9 +17,9 @@
 
 .tuk-ticket-comments {
   min-height: 64px;
-  border-left: 1px solid @tuk-sketch-dark-border;
-  border-right: 1px solid @tuk-sketch-dark-border;
-  background-color: @tuk-body-color;
+  border-left: 1px solid @tuk-ticket-border;
+  border-right: 1px solid @tuk-ticket-border;
+  background-color: @tuk-ticket-comments-bg;
   padding: 0 20px;
   max-height: 640px;
   overflow-y: auto;
@@ -25,8 +31,8 @@
   border-radius: 0 0 2px 2px;
   height: 64px;
   padding: 0 20px;
-  border: 1px solid @tuk-sketch-dark-border;
-  background-color: @tuk-body-color;
+  border: 1px solid @tuk-ticket-border;
+  background-color: @tuk-ticket-footer-bg;
 
   &.flex {
     display: -webkit-flex;

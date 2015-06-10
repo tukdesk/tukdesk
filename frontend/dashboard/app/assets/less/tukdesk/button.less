@@ -1,3 +1,48 @@
+@tuk-btn-border: @tuk-sketch-dark-border;
+
+@tuk-btn-default-bg: @tuk-theme-white;
+@tuk-btn-default-border: @tuk-btn-border;
+@tuk-btn-default-text: @tuk-sketch-dark-text;
+@tuk-btn-default-active-bg: @tuk-theme-grey-100;
+@tuk-btn-default-disabled-bg: @tuk-theme-white;
+@tuk-btn-default-disabled-border: @tuk-theme-grey-300;
+@tuk-btn-default-disabled-text: @tuk-theme-black-disabled;
+
+@tuk-btn-primary-bg: @tuk-theme-indigo-400;
+@tuk-btn-primary-border: @tuk-theme-indigo-700;
+@tuk-btn-primary-text: @tuk-theme-white-text;
+@tuk-btn-primary-active-bg: @tuk-theme-indigo-700;
+@tuk-btn-primary-disabled-bg: @tuk-theme-indigo-300;
+@tuk-btn-primary-disabled-text: @tuk-theme-white-secondary-text;
+
+@tuk-btn-info-bg: @tuk-theme-blue-300;
+@tuk-btn-info-border: @tuk-theme-blue-600;
+@tuk-btn-info-text: @tuk-theme-white-text;
+@tuk-btn-info-active-bg: @tuk-theme-blue-600;
+@tuk-btn-info-disabled-bg: @tuk-theme-blue-200;
+@tuk-btn-info-disabled-text: @tuk-theme-white-secondary-text;
+
+@tuk-btn-success-bg: @tuk-theme-green-400;
+@tuk-btn-success-border: @tuk-theme-green-600;
+@tuk-btn-success-text: @tuk-theme-white-text;
+@tuk-btn-success-active-bg: @tuk-theme-green-600;
+@tuk-btn-success-disabled-bg: @tuk-theme-green-300;
+@tuk-btn-success-disabled-text: @tuk-theme-white-secondary-text;
+
+@tuk-btn-warning-bg: @tuk-theme-orange-400;
+@tuk-btn-warning-border: @tuk-theme-orange-700;
+@tuk-btn-warning-text: @tuk-theme-white-text;
+@tuk-btn-warning-active-bg: @tuk-theme-orange-700;
+@tuk-btn-warning-disabled-bg: @tuk-theme-orange-300;
+@tuk-btn-warning-disabled-text: @tuk-theme-white-secondary-text;
+
+@tuk-btn-danger-bg: @tuk-theme-red-400;
+@tuk-btn-danger-border: @tuk-theme-red-800;
+@tuk-btn-danger-text: @tuk-theme-white-text;
+@tuk-btn-danger-active-bg: @tuk-theme-red-800;
+@tuk-btn-danger-disabled-bg: @tuk-theme-red-300;
+@tuk-btn-danger-disabled-text: @tuk-theme-white-secondary-text;
+
 .tuk-btn {
   border-radius: 2px;
   min-width: 80px;
@@ -7,7 +52,7 @@
   line-height: 34px;
   padding: 0 12px;
   display: inline-block;
-  border: 1px solid @tuk-sketch-dark-border;
+  border: 1px solid @tuk-btn-border;
 
   &:hover {
     cursor: pointer;
@@ -21,114 +66,116 @@
   }
 
   &.tuk-btn-default {
-    color: @tuk-sketch-dark-text;
-    background-color: @tuk-theme-white;
+    border: 1px solid @tuk-btn-default-border;
+    color: @tuk-btn-default-text;
+    background-color: @tuk-btn-default-bg;
 
     &:hover {
-      background-color: @tuk-theme-grey-100;
+      background-color: @tuk-btn-default-active-bg;
     }
 
     &.disabled {
-      color: @tuk-theme-black-disabled;
-      border: 1px solid @tuk-theme-grey-300;
+      color: @tuk-btn-default-disabled-text;
+      border: 1px solid @tuk-btn-default-disabled-border;
+      background-color: @tuk-btn-default-disabled-bg;
 
       &:hover {
-        background-color: @tuk-theme-white;
+        background-color: @tuk-btn-default-disabled-bg;
       }
     }
   }
 
   &.tuk-btn-primary {
-    border-color: @tuk-theme-indigo-700;
-    color: @tuk-theme-white-text;
-    background-color: @tuk-theme-indigo-400;
+    border-color: @tuk-btn-primary-border;
+    color: @tuk-btn-primary-text;
+    background-color: @tuk-btn-primary-bg;
 
     &:hover {
-      background-color: @tuk-theme-indigo-700;
+      background-color: @tuk-btn-primary-active-bg;
     }
 
     &.disabled {
-      color: @tuk-theme-white-secondary-text;
-      background-color: @tuk-theme-indigo-300;
+      color: @tuk-btn-primary-disabled-text;
+      background-color: @tuk-btn-primary-disabled-bg;
 
       &:hover {
-        background-color: @tuk-theme-indigo-300;
+        background-color: @tuk-btn-primary-disabled-bg;
       }
     }
   }
 
   &.tuk-btn-info {
-    border-color: @tuk-theme-blue-600;
-    color: @tuk-theme-white-text;
-    background-color: @tuk-theme-blue-300;
+    border-color: @tuk-btn-info-border;
+    color: @tuk-btn-info-text;
+    background-color: @tuk-btn-info-bg;
 
     &:hover {
-      background-color: @tuk-theme-blue-600;
+      background-color: @tuk-btn-info-active-bg;
     }
 
     &.disabled {
-      color: @tuk-theme-white-secondary-text;
-      background-color: @tuk-theme-blue-200;
+      color: @tuk-btn-info-disabled-text;
+      background-color: @tuk-btn-info-disabled-bg;
 
       &:hover {
-        background-color: @tuk-theme-blue-200;
+        background-color: @tuk-btn-info-disabled-bg;
       }
     }
   }
 
   &.tuk-btn-success {
-    border-color: @tuk-theme-green-600;
-    color: @tuk-theme-white-text;
-    background-color: @tuk-theme-green-400;
+    border-color: @tuk-btn-success-border;
+    color: @tuk-btn-success-text;
+    background-color: @tuk-btn-success-bg;
 
     &:hover {
-      background-color: @tuk-theme-green-600;
+      background-color: @tuk-btn-success-active-bg;
     }
 
     &.disabled {
-      color: @tuk-theme-white-secondary-text;
-      background-color: @tuk-theme-green-300;
+      color: @tuk-btn-success-disabled-text;
+      background-color: @tuk-btn-success-disabled-bg;
 
       &:hover {
-        background-color: @tuk-theme-green-300;
+        background-color: @tuk-btn-success-disabled-bg;
       }
     }
   }
 
   &.tuk-btn-warning {
-    border-color: @tuk-theme-orange-700;
-    color: @tuk-theme-white-text;
-    background-color: @tuk-theme-orange-400;
+    border-color: @tuk-btn-warning-border;
+    color: @tuk-btn-warning-text;
+    background-color: @tuk-btn-warning-bg;
 
     &:hover {
-      background-color: @tuk-theme-orange-700;
+      background-color: @tuk-btn-warning-active-bg;
     }
 
     &.disabled {
-      color: @tuk-theme-white-secondary-text;
-      background-color: @tuk-theme-orange-300;
+      color: @tuk-btn-warning-disabled-text;
+      background-color: @tuk-btn-warning-disabled-bg;
 
-      &:active {
-        background-color: @tuk-theme-orange-300;
+      &:hover {
+        background-color: @tuk-btn-warning-disabled-bg;
       }
     }
   }
 
   &.tuk-btn-danger {
-    border-color: @tuk-theme-red-800;
-    color: @tuk-theme-white-text;
-    background-color: @tuk-theme-red-400;
+    border-color: @tuk-btn-danger-border;
+    color: @tuk-btn-danger-text;
+    background-color: @tuk-btn-danger-bg;
 
     &:hover {
-      background-color: @tuk-theme-red-800;
+      background-color: @tuk-btn-danger-active-bg;
     }
 
     &.disabled {
-      color: @tuk-theme-white-secondary-text;
-      background-color: @tuk-theme-red-300;
+      color: @tuk-btn-danger-disabled-text;
+      background-color: @tuk-btn-danger-disabled-bg;
 
       &:hover {
-        background-color: @tuk-theme-red-300;
+        background-color: @tuk-btn-danger-disabled-bg;
       }
     }
   }
