@@ -53,20 +53,14 @@
   padding: 0 12px;
   display: inline-block;
   border: 1px solid @tuk-btn-border;
-
-  &:hover {
-    cursor: pointer;
-  }
+  cursor: pointer;
 
   &.disabled {
-
-    &:hover {
-      cursor: default;
-    }
+    cursor: default;
   }
 
   &.tuk-btn-default {
-    border: 1px solid @tuk-btn-default-border;
+    border-color: @tuk-btn-default-border;
     color: @tuk-btn-default-text;
     background-color: @tuk-btn-default-bg;
 

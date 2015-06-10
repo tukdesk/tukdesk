@@ -1,6 +1,9 @@
 @tuk-ticket-border: @tuk-sketch-dark-border;
 @tuk-ticket-header-bg: @tuk-theme-white;
 @tuk-ticket-comments-bg: @tuk-body-color;
+@tuk-ticket-comments-expand-btn-icon: @tuk-theme-black-hint;
+@tuk-ticket-comments-expand-btn-active-icon: @tuk-theme-black-text;
+@tuk-ticket-comments-expand-btn-active-bg: @tuk-theme-grey-100;
 @tuk-ticket-footer-bg: @tuk-body-color;
 
 .tuk-ticket-header {
@@ -21,17 +24,19 @@
   border-right: 1px solid @tuk-ticket-border;
   background-color: @tuk-ticket-comments-bg;
   padding: 0 20px;
-  max-height: 640px;
+  max-height: 480px;
   overflow-y: auto;
+  position: relative;
 
   .clearfix();
 }
 
 .tuk-ticket-footer {
   border-radius: 0 0 2px 2px;
-  height: 64px;
+  min-height: 64px;
   padding: 0 20px;
   border: 1px solid @tuk-ticket-border;
+  border-top: none;
   background-color: @tuk-ticket-footer-bg;
 
   &.flex {
