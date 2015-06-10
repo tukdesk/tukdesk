@@ -7,7 +7,7 @@
 
 .dropdown-menu {
   position: absolute;
-  display: block;
+  display: none;
   top: 100%;
   left: 0;
   right: auto;
@@ -60,6 +60,38 @@
       &:hover {
         background-color: @tuk-dropdown-menu-bg;
       }
+    }
+  }
+}
+
+.open {
+  .dropdown-menu {
+    display: block;
+  }
+
+  .tuk-btn.dropdown-toggle {
+    &.tuk-btn-default {
+      background-color: @tuk-theme-grey-100;
+    }
+
+    &.tuk-btn-primary {
+      background-color: @tuk-theme-indigo-700;
+    }
+
+    &.tuk-btn-info {
+      background-color: @tuk-theme-blue-600;
+    }
+
+    &.tuk-btn-success {
+      background-color: @tuk-theme-green-600;
+    }
+
+    &.tuk-btn-warning {
+      background-color: @tuk-theme-orange-700;
+    }
+
+    &.tuk-btn-danger {
+      background-color: @tuk-theme-red-800;
     }
   }
 }
