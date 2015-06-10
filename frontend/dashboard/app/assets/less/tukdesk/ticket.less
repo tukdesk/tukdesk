@@ -18,17 +18,36 @@
   position: relative;
 }
 
-.tuk-ticket-comments {
-  min-height: 64px;
+.tuk-ticket-body {
   border-left: 1px solid @tuk-ticket-border;
   border-right: 1px solid @tuk-ticket-border;
   background-color: @tuk-ticket-comments-bg;
-  padding: 0 20px;
-  max-height: 480px;
-  overflow-y: auto;
-  position: relative;
 
-  .clearfix();
+  .tuk-ticket-comments {
+    min-height: 64px;
+    padding: 0 20px;
+    max-height: 480px;
+    overflow-y: auto;
+    position: relative;
+
+    .clearfix();
+  }
+
+  .tuk-ticket-body-comments-expand {
+    padding: 5px 0;
+    text-align: center;
+    cursor: pointer;
+
+    i {
+      color: @tuk-ticket-comments-expand-btn-icon;
+    }
+
+    &:hover {
+      i {
+        color: @tuk-ticket-comments-expand-btn-active-icon;
+      }
+    }
+  }
 }
 
 .tuk-ticket-footer {
@@ -36,7 +55,6 @@
   min-height: 64px;
   padding: 0 20px;
   border: 1px solid @tuk-ticket-border;
-  border-top: none;
   background-color: @tuk-ticket-footer-bg;
 
   &.flex {
