@@ -7,7 +7,7 @@
   line-height: 34px;
   padding: 0 12px;
   display: inline-block;
-  border: 1px solid @tuk-theme-dark-border;
+  border: 1px solid @tuk-sketch-dark-border;
 
   &:hover {
     cursor: pointer;
@@ -21,7 +21,7 @@
   }
 
   &.tuk-btn-default {
-    color: @tuk-theme-dark-text;
+    color: @tuk-sketch-dark-text;
     background-color: @tuk-theme-white;
 
     &:hover {
@@ -33,6 +33,16 @@
       border: 1px solid @tuk-theme-grey-300;
 
       &:hover {
+        background-color: @tuk-theme-white;
+      }
+    }
+
+    &.dropdown-toggle {
+      &:focus {
+        background-color: @tuk-theme-grey-100;
+      }
+
+      &.disabled:focus {
         background-color: @tuk-theme-white;
       }
     }
@@ -55,6 +65,16 @@
         background-color: @tuk-theme-indigo-300;
       }
     }
+
+    &.dropdown-toggle {
+      &:focus {
+        background-color: @tuk-theme-indigo-700;
+      }
+
+      &.disabled:focus {
+        background-color: @tuk-theme-indigo-300;
+      }
+    }
   }
 
   &.tuk-btn-info {
@@ -71,6 +91,16 @@
       background-color: @tuk-theme-blue-200;
 
       &:hover {
+        background-color: @tuk-theme-blue-200;
+      }
+    }
+
+    &.dropdown-toggle {
+      &:focus {
+        background-color: @tuk-theme-blue-600;
+      }
+
+      &.disabled:focus {
         background-color: @tuk-theme-blue-200;
       }
     }
@@ -93,6 +123,16 @@
         background-color: @tuk-theme-green-300;
       }
     }
+
+    &.dropdown-toggle {
+      &:focus {
+        background-color: @tuk-theme-green-600;
+      }
+
+      &.disabled:focus {
+        background-color: @tuk-theme-green-300;
+      }
+    }
   }
 
   &.tuk-btn-warning {
@@ -112,6 +152,16 @@
         background-color: @tuk-theme-orange-300;
       }
     }
+
+    &.dropdown-toggle {
+      &:focus {
+        background-color: @tuk-theme-orange-700;
+      }
+
+      &.disabled:focus {
+        background-color: @tuk-theme-orange-300;
+      }
+    }
   }
 
   &.tuk-btn-danger {
@@ -128,6 +178,16 @@
       background-color: @tuk-theme-red-300;
 
       &:hover {
+        background-color: @tuk-theme-red-300;
+      }
+    }
+
+    &.dropdown-toggle {
+      &:focus {
+        background-color: @tuk-theme-red-800;
+      }
+
+      &.disabled:focus {
         background-color: @tuk-theme-red-300;
       }
     }
