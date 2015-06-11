@@ -8,6 +8,7 @@ import (
 	"github.com/tukdesk/tukdesk/backend/models/helpers"
 
 	"github.com/tukdesk/httputils/gojimiddleware"
+	"github.com/tukdesk/httputils/jsonutils"
 	"github.com/tukdesk/mgoutils"
 	"github.com/zenazn/goji/web"
 )
@@ -34,6 +35,7 @@ func main() {
 
 	// init app
 	app := web.New()
+	app.NotFound(jsonutils.NotFoundHandler)
 	apis.RegisterBaseModule(cfg, app)
 	apis.RegisterBrandModule(cfg, app)
 	apis.RegisterProfileModule(cfg, app)

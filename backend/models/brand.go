@@ -20,7 +20,7 @@ type BrandAutorizationInfo struct {
 
 type BrandPreExtend struct {
 	Ticket []*ExtendField `json:"ticket" bson:"ticket"`
-	Client []*ExtendField `json:"client" bson:"ticket"`
+	Client []*ExtendField `json:"client" bson:"client"`
 }
 
 type Brand struct {

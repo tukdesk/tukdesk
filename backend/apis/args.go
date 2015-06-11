@@ -7,7 +7,7 @@ import (
 )
 
 // base
-type SignupArgs struct {
+type SigninArgs struct {
 	Password string `json:"password"`
 }
 

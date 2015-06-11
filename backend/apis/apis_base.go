@@ -22,7 +22,7 @@ func RegisterBaseModule(cfg config.Config, app *web.Mux) *web.Mux {
 	mux := web.New()
 
 	mux.Post("/init", m.brandInit)
-	mux.Post("/signup", m.signup)
+	mux.Post("/signin", m.signin)
 
 	gojimiddleware.RegisterSubroute("/base", app, mux)
 	return mux
@@ -78,10 +78,10 @@ func (this *BaseModule) brandInit(c web.C, w http.ResponseWriter, r *http.Reques
 	return
 }
 
-func (this *BaseModule) signup(c web.C, w http.ResponseWriter, r *http.Request) {
+func (this *BaseModule) signin(c web.C, w http.ResponseWriter, r *http.Request) {
 	CheckCurrentBrand()
 
-	args := &SignupArgs{}
+	args := &SigninArgs{}
 	GetJsonArgsFromRequest(r, args)
 
 	v := helpers.ValidationNew()

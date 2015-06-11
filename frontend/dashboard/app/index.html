@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html ng-app="tukdesk" ng-controller="indexCtrl">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>TukDesk</title>
+    <base href="/dashboard/">
+    <!--third css-->
+    <!--end third css-->
+    <link href='bower/font-awesome/css/font-awesome.min.css' rel='stylesheet' type='text/css'>
+    <link href='styles/tukdesk.css' rel='stylesheet' type='text/css'>
+</head>
+<body>
+<div>
+    <div ng-view=""></div>
+</div>
+</body>
+<!-- build:js scripts/vendor.js -->
+<!-- bower:js -->
+<script src="bower/angular/angular.js"></script>
+<script src="bower/angular-resource/angular-resource.js"></script>
+<script src="bower/angular-sanitize/angular-sanitize.js"></script>
+<script src="bower/angular-route/angular-route.js"></script>
+<script src="bower/angular-cookies/angular-cookies.js"></script>
+<!-- endbower -->
+<!-- endbuild -->
+
+<!-- build:js scripts/application.js -->
+<script type="text/javascript" src="scripts/app.js"></script>
+<script type="text/javascript" src="scripts/constant.js"></script>
+<script type="text/javascript" src="scripts/route.js"></script>
+
+<!--app services-->
+<script type="text/javascript" src="scripts/services/api.js"></script>
+<script type="text/javascript" src="scripts/services/globals.js"></script>
+<!--end app services-->
+
+<!--app controllers-->
+<script type="text/javascript" src="scripts/controllers/index.js"></script>
+<script type="text/javascript" src="scripts/controllers/init.js"></script>
+<script type="text/javascript" src="scripts/controllers/signin.js"></script>
+<script type="text/javascript" src="scripts/controllers/home.js"></script>
+<!--end app controllers-->
+
+<!--app directives-->
+<!--end app directives-->
+
+<!--run.js-->
+<script type="text/javascript" src="scripts/run.js"></script>
+<!--end run.js-->
+
+<!--end app-->
+<!-- endbuild -->
+</html>

@@ -8,6 +8,7 @@ import (
 
 type OutputUser struct {
 	Id       bson.ObjectId            `json:"id"`
+	Channel  *models.ChannelInfo      `json:"channel,omitempty"`
 	Base     *models.UserBaseInfo     `json:"base,omitempty"`
 	Personal *models.UserPersonalInfo `json:"personal,omitempty"`
 	Business *models.UserBusinessInfo `json:"business,omitempty"`
@@ -17,8 +18,9 @@ type OutputUser struct {
 
 func OutputUserBaseInfo(user *models.User) *OutputUser {
 	return &OutputUser{
-		Id:   user.Id,
-		Base: &user.Base,
+		Id:      user.Id,
+		Base:    &user.Base,
+		Channel: &user.Channel,
 	}
 }
 

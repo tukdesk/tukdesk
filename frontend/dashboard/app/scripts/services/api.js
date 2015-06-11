@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module("tukdesk").factory("api", function($http, $cookies, $resource, $log, apiPrefix) {
+angular.module("tukdesk").factory("api", function($http, $cookies, $resource, $log, apiPrefix, errorCode) {
     var fac = {};
     fac.getAuthHeader = function() {
         return $cookies.get("token") || "";
@@ -21,16 +21,16 @@ angular.module("tukdesk").factory("api", function($http, $cookies, $resource, $l
     };
 
     // request
-    var request = {};
+    fac.request = {};
     angular.forEach(['get', 'delete', 'head', 'jsonp'], function(name) {
-        request[name] = function(path, config) {
+        fac.request[name] = function(path, config) {
             var url = fac.apiUrl(path);
             config = config || {};
             return $http[name](url, config);
         };
     });
     angular.forEach(['post', 'put'], function(name) {
-        request[name] = function(path, data, config) {
+        fac.request[name] = function(path, data, config) {
             var url = fac.apiUrl(path);
             config = config || {};
             return $http[name](url, data, config);
@@ -86,29 +86,37 @@ angular.module("tukdesk").factory("api", function($http, $cookies, $resource, $l
     });
 
     // errors
-    fac.logReqErr = function(data, status, headers) {
+    fac.logHTTPErr = function(data, status, headers) {
         $log.error("Status: " + status + "; "
             + "Code: " + data["error_code"] + "; "
-            + "Message: " + data["error_message"] + "; "
+            + "Message: " + data["error_msg"] + "; "
             + "Req-Id: " + headers("X-Req-Id"));
     };
 
+    fac.logResourceErr = function(resErr) {
+        fac.logHTTPErr(resErr.data, resErr.status, resErr.headers)
+    };
+
     fac.resourceErr = function (cb) {
-        return function (resp) {
-            fac.logReqErr(resp.data, resp.status, resp.headers);
+        return function (resErr) {
+            fac.logResourceErr(resErr);
             if (angular.isFunction(cb)) {
-                cb();
+                cb(resErr);
             }
         }
     };
 
     fac.httpErr = function (cb) {
         return function (data, status, headers, config) {
-            fac.logReqErr(data, status, headers);
+            fac.logHTTPErr(data, status, headers);
             if (angular.isFunction(cb)) {
                 cb(data, status, headers, config);
             }
         }
+    };
+
+    fac.isErrorType = function(code, typ) {
+        return errorCode[typ] === code;
     };
 
     return fac;
