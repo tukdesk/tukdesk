@@ -34,6 +34,7 @@ func RegisterTicketsModule(cfg config.Config, app *web.Mux) *web.Mux {
 	mux.Get("/:ticketId/comments", m.commentList)
 	mux.Post("/:ticketId/comments", m.commentAdd)
 	mux.Put("/:ticketId/comments/:commentId", m.commentUpdate)
+	mux.Use(CurrentUser)
 
 	gojimiddleware.RegisterSubroute("/tickets", app, mux)
 	return mux

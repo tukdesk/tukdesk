@@ -25,6 +25,7 @@ func RegisterBrandModule(cfg config.Config, app *web.Mux) *web.Mux {
 	mux.Put("", m.brandUpdate)
 	mux.Get("/key", m.brandAPIKey)
 	mux.Put("/key", m.brandResetAPIKey)
+	mux.Use(CurrentUser)
 
 	gojimiddleware.RegisterSubroute("/brand", app, mux)
 	return mux

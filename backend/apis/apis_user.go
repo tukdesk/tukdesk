@@ -28,6 +28,7 @@ func RegisterUserModule(cfg config.Config, app *web.Mux) *web.Mux {
 	mux.Get("", m.userList)
 	mux.Get("/:userId", m.userInfo)
 	mux.Put("/:userId", m.userUpdate)
+	mux.Use(CurrentUser)
 
 	gojimiddleware.RegisterSubroute("/users", app, mux)
 	return mux

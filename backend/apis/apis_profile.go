@@ -24,6 +24,7 @@ func RegisterProfileModule(cfg config.Config, app *web.Mux) *web.Mux {
 
 	mux.Get("", m.profile)
 	mux.Put("", m.profileUpdate)
+	mux.Use(CurrentUser)
 
 	gojimiddleware.RegisterSubroute("/profile", app, mux)
 	return mux

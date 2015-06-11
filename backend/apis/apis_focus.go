@@ -28,6 +28,7 @@ func RegisterFocusModule(cfg config.Config, app *web.Mux) *web.Mux {
 	mux.Get("", m.focusList)
 	mux.Post("", m.focusAdd)
 	mux.Put("/:focusId", m.focusHandle)
+	mux.Use(CurrentUser)
 
 	gojimiddleware.RegisterSubroute("/focus", app, mux)
 	return mux
