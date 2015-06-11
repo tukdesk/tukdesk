@@ -25,10 +25,7 @@ func CurrentUser(c *web.C, h http.Handler) http.Handler {
 }
 
 func GetCurrentUser(c *web.C, w http.ResponseWriter, r *http.Request) *models.User {
-	if helpers.CurrentBrand() == nil {
-		abort(ErrBrandNotFound)
-		return nil
-	}
+	CheckCurrentBrand()
 
 	if user, ok := c.Env[currentUserKey].(*models.User); ok {
 		return user
