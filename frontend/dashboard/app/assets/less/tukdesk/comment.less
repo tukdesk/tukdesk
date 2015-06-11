@@ -4,12 +4,14 @@
 @tuk-comment-btn-text: @tuk-theme-black-secondary-text;
 @tuk-comment-btn-active-text: @tuk-theme-black-text;
 
+@tuk-comment-space: 20px;
+
 .tuk-comment {
-  margin: 20px 0;
+  margin: @tuk-comment-space 0;
 
   .tuk-name-panel {
     position: relative;
-    padding-left: 20px;
+    padding-left: @tuk-comment-space;
     z-index: 99;
   }
 
@@ -17,12 +19,12 @@
     background-color: @tuk-comment-default-bg;
     border-radius: 2px;
     margin-top: -24px;
-    padding: 44px 20px;
+    padding: 44px @tuk-comment-space;
     position: relative;
 
     .tuk-comment-time {
       position: absolute;
-      right: 20px;
+      right: @tuk-comment-space;
       top: -7px;
     }
   }

@@ -6,15 +6,19 @@
 @tuk-ticket-comments-expand-btn-active-bg: @tuk-theme-grey-100;
 @tuk-ticket-footer-bg: @tuk-theme-card-color;
 
+@tuk-ticket-space: 40px;
+@tuk-ticket-bar-height: 64px;
+@tuk-ticket-bar-line-height: 62px;
+
 .tuk-ticket-header {
   border-radius: 2px 2px 0 0;
-  height: 64px;
+  height: @tuk-ticket-bar-height;
   border: 1px solid @tuk-ticket-border;
   background-color: @tuk-ticket-header-bg;
   font-size: 20px;
   font-weight: 700;
-  text-indent: 18px;
-  line-height: 64px;
+  padding: 0 @tuk-ticket-space;
+  line-height: @tuk-ticket-bar-line-height;
   position: relative;
 }
 
@@ -24,8 +28,8 @@
   background-color: @tuk-ticket-comments-bg;
 
   .tuk-ticket-comments {
-    min-height: 64px;
-    padding: 0 20px;
+    min-height: @tuk-ticket-bar-height;
+    padding: 0 @tuk-ticket-space;
     max-height: 480px;
     overflow-y: auto;
     position: relative;
@@ -53,7 +57,7 @@
 .tuk-ticket-footer {
   border-radius: 0 0 2px 2px;
   min-height: 64px;
-  padding: 0 20px;
+  padding: 0 @tuk-ticket-space;
   border: 1px solid @tuk-ticket-border;
   background-color: @tuk-ticket-footer-bg;
 
