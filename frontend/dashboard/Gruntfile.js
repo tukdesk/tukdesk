@@ -38,6 +38,13 @@ module.exports = function (grunt) {
                         src: "tukdesk.less",
                         dest: "<%= tudesk.dist %>/styles",
                         ext: ".css"
+                    },
+                    {
+                        expand: true,
+                        cwd: "<%= tudesk.app %>/assets/less/bootstrap",
+                        src: "bootstrap.less",
+                        dest: "<%= tudesk.dist %>/styles",
+                        ext: ".css"
                     }
                 ]
             },
@@ -51,6 +58,13 @@ module.exports = function (grunt) {
                         expand: true,
                         cwd: "<%= tudesk.app %>/assets/less/tukdesk",
                         src: "tukdesk.less",
+                        dest: "<%= tudesk.app %>/styles",
+                        ext: ".css"
+                    },
+                    {
+                        expand: true,
+                        cwd: "<%= tudesk.app %>/assets/less/bootstrap",
+                        src: "bootstrap.less",
                         dest: "<%= tudesk.app %>/styles",
                         ext: ".css"
                     }

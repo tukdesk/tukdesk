@@ -74,5 +74,44 @@ angular.module("tukdesk")
         };
         // user info end
 
+        // ticket list
+        fac.ticketsGlobalListReset = function() {
+            fac.ticketsGlobal.list = {
+                "count": 0,
+                "items": []
+            };
+            fac.ticketsGlobal.listLoaded = false;
+        };
+
+        fac.ticketsGlobalListViewReset = function() {
+            fac.ticketsGlobal.view = {
+                filter: {}
+            };
+            fac.ticketsGlobal.viewInitialized = false;
+        };
+
+        fac.ticketsGlobalListLoad = function(forced, errCb) {
+            if (forced === true || fac.ticketsGlobal.listLoaded === false) {
+                return api.resTickets.list(fac.ticketsGlobal.view.filter)
+                    .$promise.then(function(data) {
+                        fac.ticketsGlobal.list = data;
+                        fac.ticketsGlobal.listLoaded = true;
+                    }, api.resourceErr(errCb))
+            }
+        };
+
+        fac.ticketsGlobalListRefresh = function(errCb) {
+            return fac.ticketsGlobalListLoad(true, errCb);
+        };
+
+        fac.ticketsGlobalReset = function() {
+            fac.ticketsGlobal = {};
+            fac.ticketsGlobalListReset();
+            fac.ticketsGlobalListViewReset();
+        };
+
+        fac.ticketsGlobalReset();
+        // ticket list end
+
         return fac;
     });

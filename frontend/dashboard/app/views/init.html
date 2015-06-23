@@ -1,8 +1,30 @@
-<div>
-    Init Ctrl
-    <input type="text" placeholder="品牌名称" ng-model="initInfo.brandName"/>
-    <input type="text" placeholder="邮箱地址" ng-model="initInfo.email"/>
-    <input type="text" placeholder="登录密码" ng-model="initInfo.password"/>
-    <input type="text" placeholder="称呼" ng-model="initInfo.name"/>
-    <div class="tuk-btn tuk-btn-default" ng-click="initInfoSubmit()">初始化</div>
+<div class="container">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">品牌初始化</h3>
+            </div>
+            <div class="panel-body">
+                <form>
+                    <div class="form-group">
+                        <label for="initBrandName">品牌名称</label>
+                        <input type="text" class="form-control" id="initBrandName" placeholder="品牌名称" ng-model="initInfo.brandName"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="initEmail">邮箱地址</label>
+                        <input type="text" class="form-control" id="initEmail" placeholder="邮箱地址" ng-model="initInfo.email"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="initPassword">登入密码</label>
+                        <input type="text" class="form-control" id="initPassword" placeholder="登入密码" ng-model="initInfo.password"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="initName">称呼</label>
+                        <input type="text" class="form-control" id="initname" placeholder="称呼" ng-model="initInfo.name"/>
+                    </div>
+                    <div class="btn btn-default" ng-click="initInfoSubmit()">初始化</div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>

@@ -50,6 +50,11 @@ var (
 	}
 
 	TicketRankOptions = []interface{}{0, 1, 2, 3, 4, 5}
+
+	TicketChannelOptionsForCreate = []interface{}{
+		TicketChannelWeb,
+		TicketChannelEmail,
+	}
 )
 
 func TicketGetValidSubject(s string) string {

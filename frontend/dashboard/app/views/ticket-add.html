@@ -1,0 +1,32 @@
+<div class="container">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">新建工单</h3>
+            </div>
+            <div class="panel-body">
+                <form>
+                    <div class="form-group">
+                        <label for="ticketNewEmail">邮箱地址</label>
+                        <input type="text" class="form-control" id="ticketNewEmail" ng-model="ticketAddInfo.email"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="ticketNewSubject">标题</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="ticketNewSubject" ng-model="ticketAddInfo.subject"/>
+                            <div class="input-group-addon">
+                                <input type="checkbox" id="ticketNewPublic" ng-model="ticketAddInfo.isPublic"/>
+                                <span class="tuk-text-small">公开</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ticketNewContent">描述</label>
+                        <textarea name="ticketNewContent" id="ticketNewContent" class="form-control" ng-model="ticketAddInfo.content"></textarea>
+                    </div>
+                    <a class="btn btn-default" ng-click="ticketAddSubmit()">提交</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

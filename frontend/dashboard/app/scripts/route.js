@@ -53,13 +53,6 @@ angular.module("tukdesk").config(function($routeProvider, $locationProvider) {
     };
 
     $routeProvider
-        .when("/", {
-            controller: "homeCtrl",
-            templateUrl: "/views/home.html",
-            resolve: {
-                checkAll: checkAll
-            }
-        })
         .when("/init", {
             controller: "initCtrl",
             templateUrl: "/views/init.html"
@@ -71,7 +64,21 @@ angular.module("tukdesk").config(function($routeProvider, $locationProvider) {
                 checkBrand: checkBrand
             }
         })
+        .when("/tickets", {
+            controller: "ticketListCtrl",
+            templateUrl: "/views/ticket-list.html",
+            resolve: {
+                checkAll: checkAll
+            }
+        })
+        .when("/tickets/add", {
+            controller: "ticketAddCtrl",
+            templateUrl: "/views/ticket-add.html",
+            resolve: {
+                checkAll: checkAll
+            }
+        })
         .otherwise({
-            redirectTo: "/"
+            redirectTo: "/tickets"
         });
 });

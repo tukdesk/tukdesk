@@ -79,6 +79,12 @@ func ValidationForTicketContent(v *validation.Validation, key, content string) *
 	return v
 }
 
+func ValidationForTicketChannel(v *validation.Validation, key, channel string) *validation.Validation {
+	v.Required(key, channel)
+	v.In(key, channel, TicketChannelOptionsForCreate)
+	return v
+}
+
 func ValidationForTicketExtendField(v *validation.Validation, extend map[string]string) *validation.Validation {
 	for key, val := range extend {
 		v.MaxSize(fmt.Sprintf("extend.%s", key), val, TicketExtendFieldMaxLength)

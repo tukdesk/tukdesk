@@ -132,15 +132,12 @@ func (this *TicketModule) ticketAdd(c web.C, w http.ResponseWriter, r *http.Requ
 		args.Status = helpers.TicketStatusDefault
 	}
 
-	if args.Channel == "" {
-		args.Channel = helpers.TicketChannelWeb
-	}
-
 	args.Extend = helpers.TicketParseExtendFromPreSet(args.Extend)
 
 	v := helpers.ValidationNew()
 	helpers.ValidationForTicketSubject(v, "subject", args.Subject)
 	helpers.ValidationForTicketContent(v, "content", args.Content)
+	helpers.ValidationForTicketChannel(v, "channel", args.Channel)
 	helpers.ValidationForTicketExtendField(v, args.Extend)
 
 	CheckValidation(v)

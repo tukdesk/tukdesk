@@ -1,0 +1,40 @@
+<div class="container">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="tuk-ticket-list">
+            <div class="tuk-ticket" ng-repeat="ticket in globals.ticketsGlobal.list.items">
+                <div class="tuk-ticket-header">
+                    <span>[{{utils.ticketStatusStr(ticket.status)}}]</span>
+                    <span ng-bind="ticket.subject"></span>
+                    <div class="tuk-corner" ng-class="utils.ticketPriorityClass(ticket.priority)"></div>
+                </div>
+                <div class="tuk-ticket-body">
+                    <div class="tuk-ticket-comments">
+                        <div class="tuk-comment tuk-comment-type-public">
+                            <div class="tuk-name-panel">
+                                <div class="tuk-avatar"></div>
+                                <span class="tuk-name">Matthew Fuller</span>
+                            </div>
+                            <div class="tuk-comment-body">
+                                <div class="tuk-comment-time">2015-06-09 14:02</div>
+                                <div class="tuk-comment-content">
+                                    Nam porttitor blandit accumsan. Ut vel dictum sem, a pretium dui. In malesuada enim in dolor euismod, id commodo mi consectetur. Curabitur at vestibulum nisi. Nullam vehicula nisi velit. Mauris turpis nisl, molestie ut ipsum et, suscipit vehicula odio. Vestibulum interdum vestibulum felis ac molestie. Praesent aliquet quam et libero dictum, vitae dignissim leo eleifend. In in turpis turpis. Quisque justo turpis, vestibulum non enim nec, tempor mollis mi. Sed vel tristique quam.
+                                </div>
+                                <div class="tuk-comment-buttons">
+                                    <div class="tuk-comment-btn"><i class="fa fa-exclamation-circle"></i> 关注</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tuk-ticket-body-comments-expand"><i class="fa fa-ellipsis-h"></i></div>
+                </div>
+                <div class="tuk-ticket-footer flex">
+                    <input type="text" placeholder="快捷回复"/>
+                    <div class="tuk-btn-group">
+                        <div class="tuk-btn tuk-btn-default">提交</div>
+                        <div class="tuk-btn tuk-btn-default dropdown-toggle"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

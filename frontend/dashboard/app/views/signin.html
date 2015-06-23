@@ -1,5 +1,22 @@
-<div>
-    Signin
-    <input type="text" placeholder="登录密码" ng-model="signinInfo.password"/>
-    <div class="tuk-btn tuk-btn-default" ng-click="signinInfoSubmit()">登录</div>
+<div class="container">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">登入</h3>
+            </div>
+            <div class="panel-body">
+                <form>
+                    <div class="form-group">
+                        <label for="signinPassword">登入密码</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="signinPassword" placeholder="登入密码" ng-model="signinInfo.password"/>
+                            <span class="input-group-btn">
+                                <a class="btn btn-default" ng-click="signinInfoSubmit()">登入</a>
+                            </span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
