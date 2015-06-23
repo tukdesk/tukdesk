@@ -19,6 +19,22 @@ type OutputTicket struct {
 	Status   string              `json:"status"`
 	Rank     int                 `json:"rank,omitempty"`
 	Extend   map[string]string   `json:"extend,omitempty"`
+	Comments []*OutputComment    `json:"comments,omitempty"`
+}
+
+func (this *OutputTicket) GetComments(query map[string]interface{}, sort []string) error {
+	comments, err := CommentFindAllByTicketId(this.Id, query, sort)
+	if err != nil {
+		return err
+	}
+
+	outputs, err := OutputCommentInfos(comments)
+	if err != nil {
+		return err
+	}
+
+	this.Comments = outputs
+	return nil
 }
 
 func OutputTicketPublicInfo(ticket *models.Ticket) (*OutputTicket, error) {

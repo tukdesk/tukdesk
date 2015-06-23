@@ -6,6 +6,11 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+const (
+	trueInQuery  = "1"
+	falseInQuery = "0"
+)
+
 // base
 type SigninArgs struct {
 	Password string `json:"password"`

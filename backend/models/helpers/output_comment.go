@@ -30,3 +30,20 @@ func OutputCommentInfo(comment *models.Comment) (*OutputComment, error) {
 	output.Updated = comment.Updated
 	return output, nil
 }
+
+func OutputCommentInfos(comments []*models.Comment) ([]*OutputComment, error) {
+	outputs := make([]*OutputComment, len(comments))
+	if len(comments) == 0 {
+		return outputs, nil
+	}
+
+	var err error
+
+	for i, comment := range comments {
+		if outputs[i], err = OutputCommentInfo(comment); err != nil {
+			return nil, err
+		}
+	}
+
+	return outputs, nil
+}

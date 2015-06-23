@@ -103,12 +103,27 @@ func (this *TicketModule) ticketList(c web.C, w http.ResponseWriter, r *http.Req
 			infoParser = helpers.OutputTicketPublicInfoForList
 		}
 
+		commentQuery := helpers.M{}
+		showComments := r.FormValue("comments") == trueInQuery
+		if showComments {
+			if !AuthorizedAsAgent(user) {
+				commentQuery["type"] = helpers.M{"$in": helpers.CommentTypeOptionsForNonAgentView}
+			}
+		}
+
 		for i, ticket := range tickets {
 			info, err := infoParser(ticket)
 			if err != nil {
 				logger.Error(err)
 				abort(ErrInternalError)
 				return
+			}
+			if showComments {
+				if err = info.GetComments(commentQuery, defaultCommentSort); err != nil {
+					logger.Error(err)
+					abort(ErrInternalError)
+					return
+				}
 			}
 			items[i] = info
 		}
@@ -210,7 +225,7 @@ func (this *TicketModule) ticketMakerForAgent(user *models.User, args *TicketAdd
 
 	CheckValidation(v)
 
-	creator, _, err := helpers.UserMustForChannelEmail(args.Email, helpers.UserGetValidName(args.Email))
+	creator, _, err := helpers.UserMustForChannelEmail(args.Email, helpers.UserGetValidNameFromEmail(args.Email))
 	if err != nil {
 		logger.Error(err)
 		abort(ErrInternalError)
