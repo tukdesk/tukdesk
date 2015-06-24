@@ -26,7 +26,7 @@ angular.module("tukdesk")
             globals.ticketsGlobalListLoad()
         };
 
-        var ticketUpdate = function(ticket) {
+        $scope.ticketUpdate = function(ticket) {
             // 如果需要等到从服务器更新数据后再改变展现, 则要将 copy 动作放到各个具体的 update func
             // 放在此处, 则不论修改是否生效, 展现都发生变化
             var copied = angular.copy(ticket);
@@ -46,7 +46,20 @@ angular.module("tukdesk")
             }
 
             ticket.priority = priority;
-            return ticketUpdate(ticket)
+            return $scope.ticketUpdate(ticket)
+        };
+
+        $scope.ticketSetToSolved = function(ticket) {
+            if ($scope.ticketIsSolved(ticket)) {
+                return
+            }
+
+            ticket.status = "SOLVED";
+            return $scope.ticketUpdate(ticket)
+        };
+
+        $scope.ticketIsSolved = function(ticket) {
+            return ticket.status === "SOLVED"
         };
 
         $scope.newCommentReset = function(ticket) {

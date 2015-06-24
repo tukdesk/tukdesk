@@ -41,8 +41,17 @@
         <div class="tuk-ticket-list">
             <div class="tuk-ticket" ng-repeat="ticket in globals.ticketsGlobal.list.items">
                 <div class="tuk-ticket-header">
-                    <span>[{{utils.ticketStatusStr(ticket.status)}}]</span>
-                    <span ng-bind="ticket.subject"></span>
+                    <div class="tuk-ticket-subject">
+                        <span>[{{utils.ticketStatusStr(ticket.status)}}]</span>
+                        <span ng-bind="ticket.subject"></span>
+                    </div>
+                    <div>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" ng-model="ticket.isPublic" ng-change="ticketUpdate(ticket)"/>
+                            所有人可见
+                        </label>
+                        <button class="btn btn-success btn-xs" ng-disabled="ticketIsSolved(ticket)" ng-click="ticketSetToSolved(ticket)"><i class="fa fa-check"></i>已解决</button>
+                    </div>
                     <div class="tuk-corner dropdown-toggle tuk-clickable" ng-class="utils.ticketPriorityClass(ticket.priority)" dropdown dropdown-toggle>
                         <ul class="dropdown-menu dropdown-menu-right">
                             <li ng-repeat="priority in ticketPriority" ng-hide="ticket.priority === priority.val"><a ng-click="ticketUpdatePriority(ticket, priority.val)"><span class="tuk-corner-choice" ng-class="utils.ticketPriorityClass(priority.val)" ng-bind="priority.name"></span></a></li>

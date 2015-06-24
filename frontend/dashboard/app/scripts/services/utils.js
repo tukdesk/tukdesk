@@ -4,6 +4,13 @@ angular.module("tukdesk")
     .factory("utils", function(ticketStatus, ticketPriority, commentTypes) {
         var fac = {};
 
+        fac.ticketStatusClass = function(statusStr) {
+            if (ticketStatus.some(function(val) {return val.val === statusStr}) === true) {
+                return "tuk-ticket-status-" + statusStr.toLowerCase()
+            }
+            return ""
+        };
+
         fac.ticketStatusStr = function(statusStr) {
             var str = "";
             ticketStatus.some(function(val) {

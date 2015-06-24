@@ -8,7 +8,6 @@
 
 @tuk-ticket-space: 40px;
 @tuk-ticket-bar-height: 64px;
-@tuk-ticket-bar-line-height: 62px;
 
 .tuk-ticket-list {
   .tuk-ticket {
@@ -22,14 +21,40 @@
 
 .tuk-ticket-header {
   border-radius: 2px 2px 0 0;
-  height: @tuk-ticket-bar-height;
+  min-height: @tuk-ticket-bar-height;
   border: 1px solid @tuk-ticket-border;
   background-color: @tuk-ticket-header-bg;
-  font-size: 20px;
-  font-weight: 700;
-  padding: 0 @tuk-ticket-space;
-  line-height: @tuk-ticket-bar-line-height;
+  padding: 15px @tuk-ticket-space;
   position: relative;
+
+  .tuk-ticket-subject {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 32px;
+  }
+
+  button.tuk-ticket-status {
+    color: @tuk-theme-white;
+    padding: 2px 8px;
+    border: none;
+    position: relative;
+
+    &.tuk-ticket-status-pending {
+      background-color: @tuk-ticket-color-status-pending;
+    }
+
+    &.tuk-ticket-status-replied {
+      background-color: @tuk-ticket-color-status-replied;
+    }
+
+    &.tuk-ticket-status-resubmitted {
+      background-color: @tuk-ticket-color-status-resubmitted;
+    }
+
+    &.tuk-ticket-status-solved {
+      background-color: @tuk-ticket-color-status-solved;
+    }
+  }
 }
 
 .tuk-ticket-body {

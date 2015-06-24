@@ -4,6 +4,8 @@ angular.module("tukdesk")
     .factory("globals", function($q, api) {
         var fac = {};
 
+        // TODO 确保不出现同时发出多个同样请求的情况
+
         // brand info
         var brandInfoReset = function() {
             fac.brand = {
