@@ -50,7 +50,7 @@
                             <input type="checkbox" ng-model="ticket.isPublic" ng-change="ticketUpdate(ticket)"/>
                             所有人可见
                         </label>
-                        <button class="btn btn-success btn-xs" ng-disabled="ticketIsSolved(ticket)" ng-click="ticketSetToSolved(ticket)"><i class="fa fa-check"></i>已解决</button>
+                        <button class="btn btn-success btn-xs" ng-hide="ticketIsSolved(ticket)" ng-click="ticketSetToSolved(ticket)"><i class="fa fa-check"></i>已解决</button>
                     </div>
                     <div class="tuk-corner dropdown-toggle tuk-clickable" ng-class="utils.ticketPriorityClass(ticket.priority)" dropdown dropdown-toggle>
                         <ul class="dropdown-menu dropdown-menu-right">
