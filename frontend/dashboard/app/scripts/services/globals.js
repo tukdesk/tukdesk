@@ -75,12 +75,16 @@ angular.module("tukdesk")
         // user info end
 
         // ticket list
+        fac.ticketsGlobalListLoadedReset = function() {
+            fac.ticketsGlobal.listLoaded = false;
+        };
+
         fac.ticketsGlobalListReset = function() {
             fac.ticketsGlobal.list = {
                 "count": 0,
                 "items": []
             };
-            fac.ticketsGlobal.listLoaded = false;
+            fac.ticketsGlobalListLoadedReset();
         };
 
         fac.ticketsGlobalListViewReset = function() {
@@ -112,6 +116,27 @@ angular.module("tukdesk")
 
         fac.ticketsGlobalReset();
         // ticket list end
+
+        // tickets global
+        fac.ticketsGlobalRefreshIfTicketInList = function(ticketId) {
+            fac.ticketsGlobal.list.items.some(function(item) {
+                if (item.id === ticketId) {
+                    fac.ticketsGlobalListRefresh();
+                }
+
+                return item.id === ticketId;
+            })
+        };
+
+
+        fac.ticketsGlobalRefreshWithTicketData = function(ticket) {
+            fac.ticketsGlobalRefreshIfTicketInList(ticket.id)
+        };
+
+        fac.ticketsGlobalRefreshWithTicketId = function(ticketId) {
+            fac.ticketsGlobalRefreshIfTicketInList(ticketId)
+        };
+        // tickets global end
 
         return fac;
     });

@@ -1,4 +1,5 @@
-@tuk-comment-default-bg: @tuk-theme-indigo-50;
+@tuk-comment-default-bg: @tuk-theme-pink-50;
+@tuk-comment-feedback-bg: @tuk-theme-indigo-50;
 @tuk-comment-public-bg: @tuk-theme-green-50;
 @tuk-comment-internal-bg: @tuk-theme-blue-50;
 @tuk-comment-btn-text: @tuk-theme-black-secondary-text;
@@ -26,6 +27,13 @@
       position: absolute;
       right: @tuk-comment-space;
       top: -7px;
+    }
+  }
+
+  &.tuk-comment-type-question,
+  &.tuk-comment-type-feedback {
+    .tuk-comment-body {
+      background-color: @tuk-comment-feedback-bg;
     }
   }
 

@@ -73,20 +73,19 @@ func TicketParseExtendFromPreSet(extend map[string]string) map[string]string {
 	return res
 }
 
-func TicketInit(ticket *models.Ticket) error {
+func TicketInit(ticket *models.Ticket, content string) error {
 	if err := ticket.Insert(); err != nil {
 		return err
 	}
-	comment := models.NewComment(ticket.Id, ticket.CreatorId, models.CommentTypeQuestion, ticket.Content)
+	comment := models.NewComment(ticket.Id, ticket.CreatorId, models.CommentTypeQuestion, content)
 	return comment.Insert()
 }
 
-func TicketNewWithChannelName(creator *models.User, chName, subject, content string, extend map[string]string) *models.Ticket {
+func TicketNewWithChannelName(creator *models.User, chName, subject string, extend map[string]string) *models.Ticket {
 	ticket := models.NewTicket(creator.Id)
 	ticket.Channel.Name = chName
 	ticket.Channel.Id = ticket.Id
 	ticket.Subject = subject
-	ticket.Content = content
 	ticket.Extend = extend
 	return ticket
 }

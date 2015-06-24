@@ -104,7 +104,7 @@ func (this *TicketModule) ticketList(c web.C, w http.ResponseWriter, r *http.Req
 		}
 
 		commentQuery := helpers.M{}
-		showComments := r.FormValue("comments") == trueInQuery
+		showComments := r.FormValue("nocomments") != trueInQuery
 		if showComments {
 			if !AuthorizedAsAgent(user) {
 				commentQuery["type"] = helpers.M{"$in": helpers.CommentTypeOptionsForNonAgentView}
@@ -172,7 +172,7 @@ func (this *TicketModule) ticketAdd(c web.C, w http.ResponseWriter, r *http.Requ
 
 	// check automation
 
-	err := helpers.TicketInit(ticket)
+	err := helpers.TicketInit(ticket, args.Content)
 	if helpers.IsDup(err) {
 		abort(ErrTicketDuplicate)
 		return
@@ -208,12 +208,12 @@ func (this *TicketModule) ticketMakerForAnonym(user *models.User, args *TicketAd
 		return nil
 	}
 
-	return helpers.TicketNewWithChannelName(creator, args.Channel, args.Subject, args.Content, args.Extend)
+	return helpers.TicketNewWithChannelName(creator, args.Channel, args.Subject, args.Extend)
 }
 
 func (this *TicketModule) ticketMakerForClient(user *models.User, args *TicketAddArgs, v *validation.Validation, logger *gojimiddleware.XLogger) *models.Ticket {
 	// 不需要 email; 不可设置 status;
-	ticket := helpers.TicketNewWithChannelName(user, args.Channel, args.Subject, args.Content, args.Extend)
+	ticket := helpers.TicketNewWithChannelName(user, args.Channel, args.Subject, args.Extend)
 	ticket.IsPublic = args.IsPublic
 	return ticket
 }
@@ -233,7 +233,7 @@ func (this *TicketModule) ticketMakerForAgent(user *models.User, args *TicketAdd
 	}
 
 	// todo accept chId for agent?
-	ticket := helpers.TicketNewWithChannelName(creator, args.Channel, args.Subject, args.Content, args.Extend)
+	ticket := helpers.TicketNewWithChannelName(creator, args.Channel, args.Subject, args.Extend)
 	ticket.IsPublic = args.IsPublic
 	ticket.Status = args.Status
 

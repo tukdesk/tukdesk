@@ -23,7 +23,6 @@ type Ticket struct {
 	Channel   ChannelInfo   `json:"channel" bson:"channel"`
 
 	Subject        string            `json:"subject" bson:"subject"`
-	Content        string            `json:"content" bson:"content"`
 	IsPublic       bool              `json:"isPublic" bson:"isPublic"`
 	Created        int64             `json:"created" bson:"created"`
 	Updated        int64             `json:"updated" bson:"updated"`

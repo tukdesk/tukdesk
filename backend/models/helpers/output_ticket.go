@@ -49,7 +49,6 @@ func OutputTicketPublicInfo(ticket *models.Ticket) (*OutputTicket, error) {
 
 	output.Channel = &ticket.Channel
 	output.Subject = ticket.Subject
-	output.Content = ticket.Content
 	output.IsPublic = ticket.IsPublic
 	output.Created = ticket.Created
 	output.Updated = ticket.Updated
@@ -70,7 +69,6 @@ func OutputTicketDetailInfo(ticket *models.Ticket) (*OutputTicket, error) {
 
 	output.Channel = &ticket.Channel
 	output.Subject = ticket.Subject
-	output.Content = ticket.Content
 	output.IsPublic = ticket.IsPublic
 	output.Created = ticket.Created
 	output.Updated = ticket.Updated

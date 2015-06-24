@@ -5,6 +5,12 @@ angular.module("tukdesk")
     .constant("errorCode", {
         brandNotFound: 110102
     })
+    .constant("broadcastEvents", {
+        ticketListRefresh: "evtTicketListRefresh",
+        ticketRefreshWithData: "evtTicketRefreshWithData",
+        ticketRefreshWithId: "evtTicketRefreshWithId",
+        ticketCommentsRefresh: "evtTicketCommentsRefresh"
+    })
     .constant("ticketStatus", [
         {
             name: "待处理",
@@ -123,4 +129,22 @@ angular.module("tukdesk")
             }
         ]
     })
+    .constant("commentTypes", [
+        {
+            name: "问题描述",
+            val: "QUESTION"
+        },
+        {
+            name: "客服回复",
+            val: "PUBLIC"
+        },
+        {
+            name: "成员评论",
+            val: "INTERNAL"
+        },
+        {
+            name: "客户反馈",
+            val: "FEEDBACK"
+        }
+    ])
 ;

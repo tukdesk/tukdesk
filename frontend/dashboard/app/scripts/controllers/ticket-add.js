@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module("tukdesk")
-    .controller("ticketAddCtrl", ["$scope", "api", function($scope, api) {
+    .controller("ticketAddCtrl", ["$scope", "api", "broadcastEvents", function($scope, api, broadcastEvents) {
         var ticketAddInfoReset = function() {
             $scope.ticketAddInfo = {
                 "channel": "_WEB",
@@ -18,6 +18,7 @@ angular.module("tukdesk")
             api.resTickets.add($scope.ticketAddInfo)
                 .$promise.then(function() {
                     ticketAddInfoReset();
+                    $scope.$emit(broadcastEvents.ticketListRefresh);
                 }, api.resourceErr());
         };
     }]);

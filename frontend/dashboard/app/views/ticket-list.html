@@ -31,6 +31,10 @@
                     <option value="">默认</option>
                 </select>
             </div>
+            <div class="form-group">
+                <button class="btn btn-default" ng-click="ticketListRefresh()"><i class="fa fa-refresh"></i></button>
+                <a class="btn btn-default" ng-click="jumpTo('/tickets/add')"><i class="fa fa-plus"></i></a>
+            </div>
         </form>
     </div>
     <div class="col-md-8 col-md-offset-2">
@@ -39,30 +43,42 @@
                 <div class="tuk-ticket-header">
                     <span>[{{utils.ticketStatusStr(ticket.status)}}]</span>
                     <span ng-bind="ticket.subject"></span>
-                    <div class="tuk-corner" ng-class="utils.ticketPriorityClass(ticket.priority)"></div>
+                    <div class="tuk-corner dropdown-toggle tuk-clickable" ng-class="utils.ticketPriorityClass(ticket.priority)" dropdown dropdown-toggle>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li ng-repeat="priority in ticketPriority" ng-hide="ticket.priority === priority.val"><a ng-click="ticketUpdatePriority(ticket, priority.val)"><span class="tuk-corner-choice" ng-class="utils.ticketPriorityClass(priority.val)" ng-bind="priority.name"></span></a></li>
+                        </ul>
+                    </div>
                 </div>
                 <div class="tuk-ticket-body">
                     <div class="tuk-ticket-comments">
-                        <div ng-repeat="comment in ticket.comments" class="tuk-comment tuk-comment-type-public" ng-show="$last || showAllComments(ticket.id)">
+                        <div ng-repeat="comment in ticket.comments" class="tuk-comment" ng-class="utils.commentTypeClass(comment.type)" ng-show="$last || showAllComments(ticket.id)">
                             <div class="tuk-name-panel">
                                 <div class="tuk-avatar"></div>
                                 <span class="tuk-name" ng-bind="comment.creator.base.name"></span>
                             </div>
                             <div class="tuk-comment-body">
-                                <div class="tuk-comment-time">2015-06-09 14:02</div>
+                                <div class="tuk-comment-time">
+                                    <span ng-bind="utils.sinceThenStr(comment.created)"></span>
+                                </div>
                                 <div class="tuk-comment-content" ng-bind="comment.content"></div>
                                 <div class="tuk-comment-buttons">
-                                    <div class="tuk-comment-btn"><i class="fa fa-exclamation-circle"></i>关注</div>
+                                    <!--<div class="tuk-comment-btn"><i class="fa fa-exclamation-circle"></i>关注</div>-->
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div ng-show="ticket.comments.length > 1" class="tuk-ticket-body-comments-expand"><i class="fa fa-ellipsis-h"></i></div>
+                    <div ng-show="ticket.comments.length > 1" class="tuk-ticket-body-comments-expand" ng-click="showAllCommentsToggle(ticket.id)"><i ng-hide="showAllComments(ticket.id)" class="fa fa-ellipsis-h"></i><i ng-show="showAllComments(ticket.id)" class="fa fa-caret-up"></i></div>
                 </div>
-                <div class="tuk-ticket-footer flex">
-                    <input type="text" placeholder="快捷回复"/>
-                    <div class="tuk-btn-group">
-                        <div class="tuk-btn tuk-btn-default">提交</div>
+                <div class="tuk-ticket-footer">
+                    <div class="input-group">
+                        <input type="text" placeholder="快捷回复" class="form-control" ng-model="ticket.newComment.content"/>
+                        <div class="input-group-btn dropup" dropdown>
+                            <button class="btn btn-default" ng-click="commentAddSubmit(ticket, 'PUBLIC')">回复给用户</button>
+                            <button class="btn btn-default dropdown-toggle" dropdown-toggle><span class="caret"></span></button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a class="tuk-clickable" ng-click="commentAddSubmit(ticket, 'INTERNAL')">添加为内部评论</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
