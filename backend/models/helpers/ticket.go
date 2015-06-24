@@ -30,7 +30,7 @@ var (
 		models.TicketStatusPending,
 		models.TicketStatusReplied,
 		models.TicketStatusResubmitted,
-		models.TicketStatusDone,
+		models.TicketStatusSolved,
 	}
 
 	TicketSortOptionsForList = []interface{}{
@@ -42,11 +42,11 @@ var (
 
 	TicketStatusOptionsForCreate = []interface{}{
 		models.TicketStatusPending,
-		models.TicketStatusDone,
+		models.TicketStatusSolved,
 	}
 
 	TicketStatusOptionsForUpdate = []interface{}{
-		models.TicketStatusDone,
+		models.TicketStatusSolved,
 	}
 
 	TicketRankOptions = []interface{}{0, 1, 2, 3, 4, 5}

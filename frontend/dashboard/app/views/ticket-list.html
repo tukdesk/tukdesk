@@ -80,6 +80,15 @@
                             </ul>
                         </div>
                     </div>
+                    <div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" ng-model="ticket.isPublic"/>
+                                所有人可见
+                            </label>
+                        </div>
+                        <div class="btn btn-danger" ng-disabled="ticket.status === 'DONE'">设为已解决</div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -10,7 +10,7 @@ const (
 	TicketStatusPending     = "PENDING"
 	TicketStatusReplied     = "REPLIED"
 	TicketStatusResubmitted = "RESUBMITTED"
-	TicketStatusDone        = "DONE"
+	TicketStatusSolved      = "SOLVED"
 )
 
 var (

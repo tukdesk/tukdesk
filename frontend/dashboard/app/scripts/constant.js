@@ -26,7 +26,7 @@ angular.module("tukdesk")
         },
         {
             name: "已解决",
-            val: "DONE"
+            val: "SOLVED"
         }
     ])
     .constant("ticketPriority", [
@@ -63,7 +63,7 @@ angular.module("tukdesk")
             },
             {
                 "name": "已解决",
-                "val": "DONE"
+                "val": "SOLVED"
             }
         ],
         "priority": [
