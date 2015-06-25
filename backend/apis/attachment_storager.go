@@ -71,6 +71,8 @@ func (this *InternalLocalStorager) Store(header *multipart.FileHeader) (*models.
 		attachment.FileSize = stat.Size()
 	}
 
+	// TODO: 长度为0的文件?
+
 	// 获取文件类型
 	attachment.MimeType = detectFileType(reader)
 
