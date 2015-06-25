@@ -12,6 +12,7 @@ import (
 	"github.com/tukdesk/httputils/gojimiddleware"
 	"github.com/tukdesk/httputils/jsonutils"
 	"github.com/tukdesk/httputils/validation"
+	"github.com/tukdesk/httputils/xlogger"
 )
 
 func abort(err error) {
@@ -75,7 +76,7 @@ func GetMapArgsFromRequest(r *http.Request) map[string]interface{} {
 	return m
 }
 
-func GetLogger(c *web.C, w http.ResponseWriter, r *http.Request) *gojimiddleware.XLogger {
+func GetLogger(c *web.C, w http.ResponseWriter, r *http.Request) *xlogger.XLogger {
 	return gojimiddleware.GetRequestLogger(c, w, r)
 }
 

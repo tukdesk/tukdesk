@@ -9,6 +9,7 @@ import (
 
 	"github.com/tukdesk/httputils/gojimiddleware"
 	"github.com/tukdesk/httputils/validation"
+	"github.com/tukdesk/httputils/xlogger"
 	"github.com/zenazn/goji/web"
 )
 
@@ -157,7 +158,7 @@ func (this *TicketModule) ticketAdd(c web.C, w http.ResponseWriter, r *http.Requ
 
 	CheckValidation(v)
 
-	var ticketMaker func(user *models.User, args *TicketAddArgs, v *validation.Validation, logger *gojimiddleware.XLogger) *models.Ticket
+	var ticketMaker func(user *models.User, args *TicketAddArgs, v *validation.Validation, logger *xlogger.XLogger) *models.Ticket
 	if AuthorizedAsAgent(user) {
 		ticketMaker = this.ticketMakerForAgent
 	} else if AuthorizedLogged(user) {
@@ -195,7 +196,7 @@ func (this *TicketModule) ticketAdd(c web.C, w http.ResponseWriter, r *http.Requ
 	return
 }
 
-func (this *TicketModule) ticketMakerForAnonym(user *models.User, args *TicketAddArgs, v *validation.Validation, logger *gojimiddleware.XLogger) *models.Ticket {
+func (this *TicketModule) ticketMakerForAnonym(user *models.User, args *TicketAddArgs, v *validation.Validation, logger *xlogger.XLogger) *models.Ticket {
 	// 需要 email; 不可设置 status, isPublic;
 	helpers.ValidationForEmail(v, "email", args.Email)
 
@@ -211,14 +212,14 @@ func (this *TicketModule) ticketMakerForAnonym(user *models.User, args *TicketAd
 	return helpers.TicketNewWithChannelName(creator, args.Channel, args.Subject, args.Extend)
 }
 
-func (this *TicketModule) ticketMakerForClient(user *models.User, args *TicketAddArgs, v *validation.Validation, logger *gojimiddleware.XLogger) *models.Ticket {
+func (this *TicketModule) ticketMakerForClient(user *models.User, args *TicketAddArgs, v *validation.Validation, logger *xlogger.XLogger) *models.Ticket {
 	// 不需要 email; 不可设置 status;
 	ticket := helpers.TicketNewWithChannelName(user, args.Channel, args.Subject, args.Extend)
 	ticket.IsPublic = args.IsPublic
 	return ticket
 }
 
-func (this *TicketModule) ticketMakerForAgent(user *models.User, args *TicketAddArgs, v *validation.Validation, logger *gojimiddleware.XLogger) *models.Ticket {
+func (this *TicketModule) ticketMakerForAgent(user *models.User, args *TicketAddArgs, v *validation.Validation, logger *xlogger.XLogger) *models.Ticket {
 	// 需要 email;
 	helpers.ValidationForEmail(v, "email", args.Email)
 	helpers.ValidationForTicketStatusOnCreate(v, "status", args.Status)
