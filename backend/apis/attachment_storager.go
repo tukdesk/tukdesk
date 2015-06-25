@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"mime/multipart"
+	"net/http"
 	"os"
 	"path"
 
@@ -23,7 +24,9 @@ type stater interface {
 	Stat() (os.FileInfo, error)
 }
 
-var ErrExpectingOSFile = fmt.Errorf("expected an *os.File")
+var (
+	ErrExpectingOSFile = fmt.Errorf("expected an *os.File")
+)
 
 const (
 	defaultDirPerm  = 0755
@@ -69,6 +72,7 @@ func (this *InternalLocalStorager) Store(header *multipart.FileHeader) (*models.
 	}
 
 	// 获取文件类型
+	attachment.MimeType = detectFileType(reader)
 
 	// 生成 sub dir
 	fileKey := attachment.Id.Hex()
@@ -106,4 +110,11 @@ func generateSubDir(fileKey []byte) string {
 	b := md5.Sum(fileKey)
 	s := fmt.Sprintf("%x", b)
 	return s[0:3] + pathSeparater + s[3:6] + pathSeparater + s[6:9]
+}
+
+func detectFileType(reader multipart.File) string {
+	head := make([]byte, 512)
+	reader.Read(head)
+	reader.Seek(0, 0)
+	return http.DetectContentType(head)
 }
