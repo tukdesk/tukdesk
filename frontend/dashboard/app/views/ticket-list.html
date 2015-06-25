@@ -1,5 +1,5 @@
 <div class="container">
-    <div>
+    <div style="height: 64px; position: fixed; top: 0; left: 0; right: 0; z-index: 999; background-color: #fdfdfd; text-align: center; line-height: 64px">
         <form class="form-inline">
             <div class="form-group">
                 <label for="ticketListFilterStatus">状态</label>
@@ -37,7 +37,7 @@
             </div>
         </form>
     </div>
-    <div class="col-md-8 col-md-offset-2">
+    <div class="col-md-8 col-md-offset-2" style="margin-top: 64px">
         <div class="tuk-ticket-list">
             <div class="tuk-ticket" ng-repeat="ticket in globals.ticketsGlobal.list.items">
                 <div class="tuk-ticket-header">
