@@ -16,10 +16,10 @@ var (
 )
 
 type FocusModule struct {
-	cfg config.Config
+	cfg *config.Config
 }
 
-func RegisterFocusModule(cfg config.Config, app *web.Mux) *web.Mux {
+func RegisterFocusModule(cfg *config.Config, app *web.Mux) *web.Mux {
 	m := FocusModule{
 		cfg: cfg,
 	}

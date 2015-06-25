@@ -11,10 +11,10 @@ import (
 )
 
 type ProfileModule struct {
-	cfg config.Config
+	cfg *config.Config
 }
 
-func RegisterProfileModule(cfg config.Config, app *web.Mux) *web.Mux {
+func RegisterProfileModule(cfg *config.Config, app *web.Mux) *web.Mux {
 	m := ProfileModule{
 		cfg: cfg,
 	}

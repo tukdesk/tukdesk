@@ -15,11 +15,17 @@ import (
 
 func main() {
 	// config for dev
-	cfg := config.Config{
+	cfg := &config.Config{
 		Addr: "127.0.0.1:52081",
+		Salt: "ivcnwHHpGZ",
 		Database: config.DatabaseConfig{
 			DBURL:  "127.0.0.1:27017",
 			DBName: "tukdesk_dev",
+		},
+		Attachment: config.AttachmentConfig{
+			Internal: config.InternalAttachmentConfig{
+				Dir: "./_attachment",
+			},
 		},
 	}
 
@@ -42,6 +48,10 @@ func main() {
 	apis.RegisterTicketsModule(cfg, app)
 	apis.RegisterUserModule(cfg, app)
 	apis.RegisterFocusModule(cfg, app)
+
+	if _, err := apis.RegisterAttachmentModule(cfg, app); err != nil {
+		log.Fatalln(err)
+	}
 
 	service := gojimiddleware.NewApp()
 	service.Mux().Use(gojimiddleware.RequestLogger)

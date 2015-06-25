@@ -53,4 +53,8 @@ var (
 	ErrFocusAlreadyHandled = jsonutils.NewAPIError(http.StatusBadRequest, 110602, "focus already handled")
 
 	ErrResourceNotFound = jsonutils.NewAPIError(http.StatusNotFound, 110701, "resource not found")
+
+	ErrAttachmentInternalInvalidToken   = jsonutils.NewAPIError(http.StatusForbidden, 110801, "invalid attachment token")
+	ErrAttachmentInternalInvalidRequest = jsonutils.NewAPIError(http.StatusBadRequest, 110802, "invalid request file")
+	ErrAttachmentInternalFileNotFound   = jsonutils.NewAPIError(http.StatusBadRequest, 110803, "file not found")
 )

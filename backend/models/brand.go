@@ -15,7 +15,6 @@ type BrandBaseInfo struct {
 
 type BrandAutorizationInfo struct {
 	APIKey string `json:"apiKey" bson:"apiKey"`
-	Salt   string `json:"salt" bson:"salt"`
 }
 
 type BrandPreExtend struct {

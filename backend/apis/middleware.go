@@ -25,13 +25,13 @@ func CurrentUser(c *web.C, h http.Handler) http.Handler {
 }
 
 func GetCurrentUser(c *web.C, w http.ResponseWriter, r *http.Request) *models.User {
-	CheckCurrentBrand()
+	brand := GetCurrentBrand()
 
 	if user, ok := c.Env[currentUserKey].(*models.User); ok {
 		return user
 	}
 
-	user, _, err := helpers.UserFromRequest(r, helpers.CurrentBrand().Authorization.APIKey)
+	user, _, err := helpers.UserFromRequest(r, brand.Authorization.APIKey)
 	if err != nil && err != helpers.ErrTokenNotFound && !helpers.IsInvalidToken(err) {
 		logger := gojimiddleware.GetRequestLogger(c, w, r)
 		logger.Error(err)

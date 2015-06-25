@@ -18,10 +18,10 @@ var (
 )
 
 type TicketModule struct {
-	cfg config.Config
+	cfg *config.Config
 }
 
-func RegisterTicketsModule(cfg config.Config, app *web.Mux) *web.Mux {
+func RegisterTicketsModule(cfg *config.Config, app *web.Mux) *web.Mux {
 	m := TicketModule{
 		cfg: cfg,
 	}

@@ -11,10 +11,10 @@ import (
 )
 
 type BrandModule struct {
-	cfg config.Config
+	cfg *config.Config
 }
 
-func RegisterBrandModule(cfg config.Config, app *web.Mux) *web.Mux {
+func RegisterBrandModule(cfg *config.Config, app *web.Mux) *web.Mux {
 	m := BrandModule{
 		cfg: cfg,
 	}

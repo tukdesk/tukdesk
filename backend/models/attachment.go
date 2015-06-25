@@ -9,10 +9,21 @@ const (
 )
 
 type Attachment struct {
-	Id        bson.ObjectId `json:"id" bson:"_id"`
-	CreatorId bson.ObjectId `json:"creatorId" bson:"creatorId"`
-	MimeType  string        `json:"mimeType" bson:"mimeType"`
-	FileSize  int64         `json:"fileSize" bson:"fileSize"`
-	FileKey   string        `json:"fileKey" bson:"fileKey"`
-	Created   int64         `json:"created" bson:"created"`
+	Id         bson.ObjectId `json:"id" bson:"_id"`
+	IsInternal bool          `json:"isInternal" bson:"isInternal"`
+	MimeType   string        `json:"mimeType" bson:"mimeType"`
+	FileSize   int64         `json:"fileSize" bson:"fileSize"`
+	FileKey    string        `json:"fileKey" bson:"fileKey"`
+	Created    int64         `json:"created" bson:"created"`
+}
+
+func NewAttachment() *Attachment {
+	return &Attachment{
+		Id:      NewId(),
+		Created: Now().Unix(),
+	}
+}
+
+func (this *Attachment) Insert() error {
+	return Insert(AttachmentCollectionName, this)
 }

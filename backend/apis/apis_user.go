@@ -16,10 +16,10 @@ var (
 )
 
 type UserModule struct {
-	cfg config.Config
+	cfg *config.Config
 }
 
-func RegisterUserModule(cfg config.Config, app *web.Mux) *web.Mux {
+func RegisterUserModule(cfg *config.Config, app *web.Mux) *web.Mux {
 	m := UserModule{
 		cfg: cfg,
 	}

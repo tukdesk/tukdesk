@@ -23,12 +23,14 @@ func NowUnix() int64 {
 	return time.Now().Unix()
 }
 
-func CheckCurrentBrand() {
-	if helpers.CurrentBrand() == nil {
+func GetCurrentBrand() *models.Brand {
+	brand := helpers.CurrentBrand()
+	if brand == nil {
 		abort(ErrBrandNotFound)
+		return nil
 	}
 
-	return
+	return brand
 }
 
 func CheckAuthorizedAsAgent(c *web.C, w http.ResponseWriter, r *http.Request) *models.User {

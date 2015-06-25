@@ -11,10 +11,10 @@ import (
 )
 
 type BaseModule struct {
-	cfg config.Config
+	cfg *config.Config
 }
 
-func RegisterBaseModule(cfg config.Config, app *web.Mux) *web.Mux {
+func RegisterBaseModule(cfg *config.Config, app *web.Mux) *web.Mux {
 	m := BaseModule{
 		cfg: cfg,
 	}
@@ -67,7 +67,7 @@ func (this *BaseModule) brandInit(c web.C, w http.ResponseWriter, r *http.Reques
 		args.Name = helpers.UserGetValidNameFromEmail(args.Email)
 	}
 
-	_, err = helpers.AgentInit(args.Email, args.Name, args.Password, brand.Authorization.Salt)
+	_, err = helpers.AgentInit(args.Email, args.Name, args.Password, this.cfg.Salt)
 	if err != nil {
 		logger.Error(err)
 		abort(ErrInternalError)
@@ -79,7 +79,7 @@ func (this *BaseModule) brandInit(c web.C, w http.ResponseWriter, r *http.Reques
 }
 
 func (this *BaseModule) signin(c web.C, w http.ResponseWriter, r *http.Request) {
-	CheckCurrentBrand()
+	brand := GetCurrentBrand()
 
 	args := &SigninArgs{}
 	GetJsonArgsFromRequest(r, args)
@@ -103,12 +103,12 @@ func (this *BaseModule) signin(c web.C, w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if !helpers.UserCheckPassword(user, args.Password, helpers.CurrentBrand().Authorization.Salt) {
+	if !helpers.UserCheckPassword(user, args.Password, this.cfg.Salt) {
 		abort(ErrAgentPasswordNotMatch)
 		return
 	}
 
-	output := helpers.OutputUserTokenInfo(helpers.TokenForUser(user, helpers.CurrentBrand().Authorization.APIKey), helpers.TokenDefaultExpirationSec)
+	output := helpers.OutputTokenInfo(helpers.TokenForUser(user, brand.Authorization.APIKey), helpers.TokenDefaultExpirationSec)
 	OutputJson(output, w, r)
 	return
 }
