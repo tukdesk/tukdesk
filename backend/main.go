@@ -8,6 +8,7 @@ import (
 	"github.com/tukdesk/tukdesk/backend/models/helpers"
 
 	"github.com/tukdesk/httputils/gojimiddleware"
+	"github.com/tukdesk/httputils/graceful"
 	"github.com/tukdesk/httputils/jsonutils"
 	"github.com/tukdesk/mgoutils"
 	"github.com/zenazn/goji/web"
@@ -53,14 +54,16 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	service := gojimiddleware.NewApp()
-	service.Mux().Use(gojimiddleware.RequestLogger)
-	service.Mux().Use(gojimiddleware.RequestTimer)
-	service.Mux().Use(gojimiddleware.RecovererJson)
+	server := web.New()
 
-	gojimiddleware.RegisterSubroute("/apis/v1", service.Mux(), app)
+	server.Use(gojimiddleware.RequestLogger)
+	server.Use(gojimiddleware.RequestTimer)
+	server.Use(gojimiddleware.RecovererJson)
 
-	if err := service.Run(cfg.Addr); err != nil {
+	gojimiddleware.RegisterSubroute("/apis/v1", server, app)
+
+	log.Println("Server on ", cfg.Addr)
+	if err := graceful.Serve(server, cfg.Addr); err != nil {
 		log.Fatalln(err)
 	}
 }
