@@ -59,6 +59,7 @@ func (this *InternalLocalStorager) Store(header *multipart.FileHeader) (*models.
 	// 生成 attachment
 	attachment := models.NewAttachment()
 	attachment.IsInternal = true
+	attachment.FileName = header.Filename
 
 	// 获取文件大小
 	if rSizer, ok := reader.(sizer); ok {

@@ -13,6 +13,7 @@ type Attachment struct {
 	IsInternal bool          `json:"isInternal" bson:"isInternal"`
 	MimeType   string        `json:"mimeType" bson:"mimeType"`
 	FileSize   int64         `json:"fileSize" bson:"fileSize"`
+	FileName   string        `json:"fileName" bson:"fileName"`
 	FileKey    string        `json:"fileKey" bson:"fileKey"`
 	Created    int64         `json:"created" bson:"created"`
 }
