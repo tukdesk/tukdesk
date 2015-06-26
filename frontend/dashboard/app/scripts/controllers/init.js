@@ -17,6 +17,6 @@ angular.module("tukdesk")
             api.request.post("/base/init", $scope.initInfo).then(function() {
                 initInfoReset();
                 $location.path("/signin")
-            }, api.resourceErr());
+            }, api.responseErr());
         };
     }]);

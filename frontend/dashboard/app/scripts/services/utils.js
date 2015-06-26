@@ -76,5 +76,9 @@ angular.module("tukdesk")
             }
         };
 
+        fac.timestampNow = function() {
+            return (new Date()).valueOf() / 1000;
+        };
+
         return fac;
     });

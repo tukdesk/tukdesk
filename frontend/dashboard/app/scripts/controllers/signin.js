@@ -19,7 +19,7 @@ angular.module("tukdesk")
                     $location.path("/");
                 })
                 .error(function (data, status, headers) {
-                    api.logHTTPErr(data, status, headers)
+                    api.logHTTPResp(data, status, headers)
                 })
         };
     }]);

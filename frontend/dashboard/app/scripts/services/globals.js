@@ -102,7 +102,7 @@ angular.module("tukdesk")
                     .$promise.then(function(data) {
                         fac.ticketsGlobal.list = data;
                         fac.ticketsGlobal.listLoaded = true;
-                    }, api.resourceErr(errCb))
+                    }, api.responseErr(errCb))
             }
         };
 

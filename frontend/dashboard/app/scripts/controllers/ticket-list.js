@@ -37,7 +37,7 @@ angular.module("tukdesk")
             return api.resTickets.update(copied)
                 .$promise.then(function(data) {
                     $scope.$emit(broadcastEvents.ticketRefreshWithData, data);
-                }, api.resourceErr());
+                }, api.responseErr());
         };
 
         $scope.ticketUpdatePriority = function(ticket, priority) {
@@ -74,7 +74,7 @@ angular.module("tukdesk")
                     ticket.comments.push(data);
                     $scope.newCommentReset(ticket);
                     $scope.$emit(broadcastEvents.ticketRefreshWithId, ticketId);
-                }, api.resourceErr())
+                }, api.responseErr())
         };
 
         var init = function() {

@@ -86,20 +86,20 @@ angular.module("tukdesk").factory("api", function($http, $cookies, $resource, $l
     });
 
     // errors
-    fac.logHTTPErr = function(data, status, headers) {
+    fac.logHTTPResp = function(data, status, headers) {
         $log.error("Status: " + status + "; "
             + "Code: " + data["error_code"] + "; "
             + "Message: " + data["error_msg"] + "; "
             + "Req-Id: " + headers("X-Req-Id"));
     };
 
-    fac.logResourceErr = function(resErr) {
-        fac.logHTTPErr(resErr.data, resErr.status, resErr.headers)
+    fac.logResponseObj = function(respObj) {
+        fac.logHTTPResp(respObj.data, respObj.status, respObj.headers)
     };
 
-    fac.resourceErr = function (cb) {
+    fac.responseErr = function (cb) {
         return function (resErr) {
-            fac.logResourceErr(resErr);
+            fac.logResponseObj(resErr);
             if (angular.isFunction(cb)) {
                 cb(resErr);
             }
@@ -108,7 +108,7 @@ angular.module("tukdesk").factory("api", function($http, $cookies, $resource, $l
 
     fac.httpErr = function (cb) {
         return function (data, status, headers, config) {
-            fac.logHTTPErr(data, status, headers);
+            fac.logHTTPResp(data, status, headers);
             if (angular.isFunction(cb)) {
                 cb(data, status, headers, config);
             }

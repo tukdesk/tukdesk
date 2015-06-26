@@ -12,7 +12,7 @@ angular.module("tukdesk").config(function($routeProvider, $locationProvider) {
         globals.brandInfoLoad().then(function(data) {
             d.resolve(data);
         }, function(brandErr) {
-            api.logResourceErr(brandErr);
+            api.logResponseObj(brandErr);
             d.reject(brandErr);
             $location.path("/init")
         });
@@ -29,7 +29,7 @@ angular.module("tukdesk").config(function($routeProvider, $locationProvider) {
                 d.reject("unauthorized");
             }
         }, function(userErr) {
-            api.logResourceErr(userErr);
+            api.logResponseObj(userErr);
             d.reject(userErr);
             $location.path("/signin")
         });
