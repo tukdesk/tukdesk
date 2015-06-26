@@ -35,19 +35,21 @@ type ProfileUpdateArgs struct {
 
 // ticket
 type TicketAddArgs struct {
-	Email    string            `json:"email"`
-	Channel  string            `json:"channel`
-	Subject  string            `json:"subject"`
-	Content  string            `json:"content"`
-	Status   string            `json:"status"`
-	IsPublic bool              `json:"isPublic,omitempty"`
-	Extend   map[string]string `json:"extend"`
+	Email       string            `json:"email"`
+	Channel     string            `json:"channel`
+	Subject     string            `json:"subject"`
+	Content     string            `json:"content"`
+	Status      string            `json:"status"`
+	IsPublic    bool              `json:"isPublic,omitempty"`
+	Attachments []*models.File    `json:"attachments"`
+	Extend      map[string]string `json:"extend"`
 }
 
 // comment
 type CommentAddArgs struct {
-	Type    string `json:"type"`
-	Content string `json:"content"`
+	Type        string         `json:"type"`
+	Content     string         `json:"content"`
+	Attachments []*models.File `json:"attachments"`
 }
 
 // focus

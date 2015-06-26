@@ -73,11 +73,12 @@ func TicketParseExtendFromPreSet(extend map[string]string) map[string]string {
 	return res
 }
 
-func TicketInit(ticket *models.Ticket, content string) error {
+func TicketInit(ticket *models.Ticket, content string, attachments []*models.File) error {
 	if err := ticket.Insert(); err != nil {
 		return err
 	}
 	comment := models.NewComment(ticket.Id, ticket.CreatorId, models.CommentTypeQuestion, content)
+	comment.Attachments = attachments
 	return comment.Insert()
 }
 

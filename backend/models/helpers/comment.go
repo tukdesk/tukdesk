@@ -26,8 +26,9 @@ var (
 	}
 )
 
-func CommentInsertForTicket(ticket *models.Ticket, creator *models.User, typ, content string) (*models.Comment, error) {
+func CommentInsertForTicket(ticket *models.Ticket, creator *models.User, typ, content string, attachments []*models.File) (*models.Comment, error) {
 	comment := models.NewComment(ticket.Id, creator.Id, typ, content)
+	comment.Attachments = attachments
 	return comment, comment.Insert()
 }
 

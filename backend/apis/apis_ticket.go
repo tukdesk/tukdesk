@@ -173,7 +173,7 @@ func (this *TicketModule) ticketAdd(c web.C, w http.ResponseWriter, r *http.Requ
 
 	// check automation
 
-	err := helpers.TicketInit(ticket, args.Content)
+	err := helpers.TicketInit(ticket, args.Content, args.Attachments)
 	if helpers.IsDup(err) {
 		abort(ErrTicketDuplicate)
 		return
@@ -498,7 +498,7 @@ func (this *TicketModule) commentAdd(c web.C, w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	comment, err := helpers.CommentInsertForTicket(ticket, user, args.Type, args.Content)
+	comment, err := helpers.CommentInsertForTicket(ticket, user, args.Type, args.Content, args.Attachments)
 	if err != nil {
 		logger.Error(err)
 		abort(ErrInternalError)
