@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module("tukdesk")
-    .controller("ticketAddCtrl", ["$scope", "api", "attachments", "broadcastEvents", function($scope, api, attachments, broadcastEvents) {
+    .controller("ticketAddCtrl", ["$scope", "api", "files", "broadcastEvents", function($scope, api, files, broadcastEvents) {
         var ticketAddInfoReset = function() {
             $scope.ticketAddInfo = {
                 "channel": "_WEB",
@@ -9,7 +9,7 @@ angular.module("tukdesk")
                 "subject": "",
                 "content": "",
                 "isPublic": false,
-                "attachments": []
+                "attachmentItems": []
             }
         };
 
@@ -17,8 +17,8 @@ angular.module("tukdesk")
 
         $scope.ticketAddSubmit = function() {
             var data = angular.copy($scope.ticketAddInfo);
-            data.attachmentIds = data.attachments.map(function(one) { return one.attachment.id; });
-            delete data.attachments;
+            data.attachments = data.attachmentItems.map(function(one) { return one.attachment; });
+            delete data.attachmentItems;
             
             api.resTickets.add(data)
                 .$promise.then(function() {
@@ -27,7 +27,7 @@ angular.module("tukdesk")
                 }, api.responseErr());
         };
 
-        $scope.sizeLimit = attachments.attachmentSizeLimit;
+        $scope.sizeLimit = files.fileSizeLimit;
 
         $scope.attachmentUpload = function(file, event, rejected) {
             if (rejected && rejected.length > 0) {
@@ -39,7 +39,7 @@ angular.module("tukdesk")
                 return
             }
 
-            attachments.getToken(attachments.tokenUrl)
+            files.getToken(files.tokenUrl)
                 .then(function(token) {
                     var item = {
                         progress:0
@@ -53,12 +53,12 @@ angular.module("tukdesk")
                         item.attachment = data
                     };
 
-                    item.uploader = attachments.uploader(file, {
+                    item.uploader = files.uploader(file, {
                         token: token,
                         progressHandler: progressHandler,
                         successHandler: successHandler
                     });
-                    $scope.ticketAddInfo.attachments.push(item);
+                    $scope.ticketAddInfo.attachmentItems.push(item);
                 }, function(tokenErrResp) {
                     api.logResponseObj(tokenErrResp)
                 })

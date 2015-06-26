@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module("tukdesk")
-    .factory("attachments", function($q, $http, api, utils, Upload) {
+    .factory("files", function($q, $http, api, utils, Upload) {
         var fac = {};
 
         var token = {
@@ -13,7 +13,7 @@ angular.module("tukdesk")
             return token.expired < utils.timestampNow();
         };
 
-        fac.tokenUrl = api.apiUrl("/attachments/token");
+        fac.tokenUrl = api.apiUrl("/files/token");
 
         fac.getToken = function(url) {
             var d = $q.defer();
@@ -34,7 +34,7 @@ angular.module("tukdesk")
         };
 
         fac.uploadConfig = {
-            uploadUrl: api.apiUrl("/attachments/upload"),
+            uploadUrl: api.apiUrl("/files/upload"),
             progressHandler: function(event) {
 //                var progressPercentage = parseInt(100.0 * event.loaded / event.total);
 //                console.log('progress: ' + progressPercentage + '% ');
@@ -44,7 +44,7 @@ angular.module("tukdesk")
             errorHandler: api.logHTTPResp
         };
 
-        fac.attachmentSizeLimit = 2097152;
+        fac.fileSizeLimit = 2097152;
 
         fac.uploader = function(file, conf) {
             var config = angular.copy(fac.uploadConfig);

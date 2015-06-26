@@ -26,7 +26,7 @@
                     </div>
                     <div class="form-group">
                         <label>附件</label>
-                        <div ng-repeat="item in ticketAddInfo.attachments">
+                        <div ng-repeat="item in ticketAddInfo.attachmentItems">
                             <span ng-hide="item.progress === 100"><span ng-bind="item.progress"></span>%</span>
                             <span ng-show="item.attachment" ng-bind="item.attachment.fileName"></span>
                         </div>
