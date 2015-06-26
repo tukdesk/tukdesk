@@ -7,12 +7,12 @@ import (
 	"github.com/zenazn/goji/web"
 )
 
-func RegisterAttachmentModule(cfg *config.Config, app *web.Mux) (*web.Mux, error) {
-	mux, err := newInternalAttachmentModule(cfg)
+func RegisterFileModule(cfg *config.Config, app *web.Mux) (*web.Mux, error) {
+	mux, err := newInternalFileModule(cfg)
 	if err != nil {
 		return nil, err
 	}
 
-	gojimiddleware.RegisterSubroute("/attachments", app, mux)
+	gojimiddleware.RegisterSubroute("/files", app, mux)
 	return mux, nil
 }

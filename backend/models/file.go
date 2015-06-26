@@ -5,10 +5,10 @@ import (
 )
 
 const (
-	AttachmentCollectionName = "attachment"
+	FileCollectionName = "file"
 )
 
-type Attachment struct {
+type File struct {
 	Id         bson.ObjectId `json:"id" bson:"_id"`
 	IsInternal bool          `json:"isInternal" bson:"isInternal"`
 	MimeType   string        `json:"mimeType" bson:"mimeType"`
@@ -18,13 +18,13 @@ type Attachment struct {
 	Created    int64         `json:"created" bson:"created"`
 }
 
-func NewAttachment() *Attachment {
-	return &Attachment{
+func NewFile() *File {
+	return &File{
 		Id:      NewId(),
 		Created: Now().Unix(),
 	}
 }
 
-func (this *Attachment) Insert() error {
-	return Insert(AttachmentCollectionName, this)
+func (this *File) Insert() error {
+	return Insert(FileCollectionName, this)
 }

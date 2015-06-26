@@ -23,9 +23,9 @@ func main() {
 			DBURL:  "127.0.0.1:27017",
 			DBName: "tukdesk_dev",
 		},
-		Attachment: config.AttachmentConfig{
-			Internal: config.InternalAttachmentConfig{
-				Dir: "./_attachment",
+		File: config.FileConfig{
+			Internal: config.InternalFileConfig{
+				Dir: "./_file",
 			},
 		},
 	}
@@ -50,7 +50,7 @@ func main() {
 	apis.RegisterUserModule(cfg, app)
 	apis.RegisterFocusModule(cfg, app)
 
-	if _, err := apis.RegisterAttachmentModule(cfg, app); err != nil {
+	if _, err := apis.RegisterFileModule(cfg, app); err != nil {
 		log.Fatalln(err)
 	}
 

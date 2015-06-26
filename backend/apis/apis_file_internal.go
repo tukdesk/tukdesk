@@ -16,22 +16,22 @@ const (
 	defaultMultipartMaxMemory = 4 << 20 // 4M
 )
 
-type InternalAttachmentModule struct {
+type InternalFileModule struct {
 	cfg      *config.Config
-	storager AttachmentStorager
+	storager FileStorager
 }
 
-func newInternalAttachmentModule(cfg *config.Config) (*web.Mux, error) {
-	if cfg.Attachment.Internal.Dir == "" {
-		return nil, fmt.Errorf("attachment dir required")
+func newInternalFileModule(cfg *config.Config) (*web.Mux, error) {
+	if cfg.File.Internal.Dir == "" {
+		return nil, fmt.Errorf("file dir required")
 	}
 
-	storager, err := newInternalLocalStorager(cfg.Attachment.Internal.Dir)
+	storager, err := newInternalLocalStorager(cfg.File.Internal.Dir)
 	if err != nil {
 		return nil, err
 	}
 
-	m := InternalAttachmentModule{
+	m := InternalFileModule{
 		cfg:      cfg,
 		storager: storager,
 	}
@@ -42,59 +42,59 @@ func newInternalAttachmentModule(cfg *config.Config) (*web.Mux, error) {
 	return mux, nil
 }
 
-func (this *InternalAttachmentModule) upload(c web.C, w http.ResponseWriter, r *http.Request) {
+func (this *InternalFileModule) upload(c web.C, w http.ResponseWriter, r *http.Request) {
 	brand := GetCurrentBrand()
 	user := GetCurrentUser(&c, w, r)
-	// check attachment token
+	// check file token
 	logger := GetLogger(&c, w, r)
 
 	if err := r.ParseMultipartForm(defaultMultipartMaxMemory); err != nil {
 		logger.Error(err)
-		abort(ErrAttachmentInternalInvalidRequest)
+		abort(ErrFileInternalInvalidRequest)
 		return
 	}
 
-	if !helpers.InternalAttachmentTokenValid(getUserIdentifier(r, user), multipartFormValue(r, "token"), brand.Authorization.APIKey) {
-		abort(ErrAttachmentInternalInvalidToken)
+	if !helpers.InternalFileTokenValid(getUserIdentifier(r, user), multipartFormValue(r, "token"), brand.Authorization.APIKey) {
+		abort(ErrFileInternalInvalidToken)
 		return
 	}
 
 	if r.MultipartForm == nil || r.MultipartForm.File == nil {
-		abort(ErrAttachmentInternalFileNotFound)
+		abort(ErrFileInternalFileNotFound)
 		return
 	}
 
 	fileHeaders := r.MultipartForm.File["file"]
 	if len(fileHeaders) == 0 {
-		abort(ErrAttachmentInternalFileNotFound)
+		abort(ErrFileInternalFileNotFound)
 		return
 	}
 
 	fileHeader := fileHeaders[0]
-	attachment, err := this.storager.Store(fileHeader)
+	fileDoc, err := this.storager.Store(fileHeader)
 	if err != nil {
 		logger.Error(err)
 		abort(ErrInternalError)
 		return
 	}
 
-	if err := attachment.Insert(); err != nil {
+	if err := fileDoc.Insert(); err != nil {
 		logger.Error(err)
 		abort(ErrInternalError)
 		return
 	}
 
-	OutputJson(attachment, w, r)
+	OutputJson(fileDoc, w, r)
 	return
 }
 
-func (this *InternalAttachmentModule) token(c web.C, w http.ResponseWriter, r *http.Request) {
+func (this *InternalFileModule) token(c web.C, w http.ResponseWriter, r *http.Request) {
 	brand := GetCurrentBrand()
 	user := GetCurrentUser(&c, w, r)
 
 	userIdentifier := getUserIdentifier(r, user)
 
-	output := helpers.OutputTokenInfo(helpers.NewInternalAttachmentToken(userIdentifier, brand.Authorization.APIKey, helpers.AttachmentTokenExpiration), helpers.AttachmentTokenExpirationSec)
+	output := helpers.OutputTokenInfo(helpers.NewInternalFileToken(userIdentifier, brand.Authorization.APIKey, helpers.FileTokenExpiration), helpers.FileTokenExpirationSec)
 	OutputJson(output, w, r)
 	return
 }

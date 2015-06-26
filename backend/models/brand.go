@@ -10,7 +10,7 @@ const (
 
 type BrandBaseInfo struct {
 	Name string `json:"name" bson:"name"`
-	Logo string `json:"logo" bson:"logo"`
+	Logo *File  `json:"file,omitempty" bson:"file,omitempty"`
 }
 
 type BrandAutorizationInfo struct {

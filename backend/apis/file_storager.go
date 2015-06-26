@@ -12,8 +12,8 @@ import (
 	"github.com/tukdesk/tukdesk/backend/models"
 )
 
-type AttachmentStorager interface {
-	Store(*multipart.FileHeader) (*models.Attachment, error)
+type FileStorager interface {
+	Store(*multipart.FileHeader) (*models.File, error)
 }
 
 type sizer interface {
@@ -39,7 +39,7 @@ type InternalLocalStorager struct {
 	dir string
 }
 
-func newInternalLocalStorager(dir string) (AttachmentStorager, error) {
+func newInternalLocalStorager(dir string) (FileStorager, error) {
 	if err := os.MkdirAll(dir, defaultDirPerm); err != nil {
 		return nil, err
 	}
@@ -49,36 +49,36 @@ func newInternalLocalStorager(dir string) (AttachmentStorager, error) {
 	}, nil
 }
 
-func (this *InternalLocalStorager) Store(header *multipart.FileHeader) (*models.Attachment, error) {
+func (this *InternalLocalStorager) Store(header *multipart.FileHeader) (*models.File, error) {
 	reader, err := header.Open()
 	if err != nil {
 		return nil, err
 	}
 	defer reader.Close()
 
-	// 生成 attachment
-	attachment := models.NewAttachment()
-	attachment.IsInternal = true
-	attachment.FileName = header.Filename
+	// 生成 fileDoc
+	fileDoc := models.NewFile()
+	fileDoc.IsInternal = true
+	fileDoc.FileName = header.Filename
 
 	// 获取文件大小
 	if rSizer, ok := reader.(sizer); ok {
-		attachment.FileSize = rSizer.Size()
+		fileDoc.FileSize = rSizer.Size()
 	} else if rStater, ok := reader.(stater); ok {
 		stat, err := rStater.Stat()
 		if err != nil {
 			return nil, err
 		}
-		attachment.FileSize = stat.Size()
+		fileDoc.FileSize = stat.Size()
 	}
 
 	// TODO: 长度为0的文件?
 
 	// 获取文件类型
-	attachment.MimeType = detectFileType(reader)
+	fileDoc.MimeType = detectFileType(reader)
 
 	// 生成 sub dir
-	fileKey := attachment.Id.Hex()
+	fileKey := fileDoc.Id.Hex()
 	subDir := generateSubDir([]byte(fileKey))
 	dir := path.Join(this.dir, subDir)
 	if err := os.MkdirAll(dir, defaultDirPerm); err != nil {
@@ -104,9 +104,9 @@ func (this *InternalLocalStorager) Store(header *multipart.FileHeader) (*models.
 		return nil, err
 	}
 
-	attachment.FileKey = path.Join(subDir, fileKey)
+	fileDoc.FileKey = path.Join(subDir, fileKey)
 
-	return attachment, nil
+	return fileDoc, nil
 }
 
 func generateSubDir(fileKey []byte) string {

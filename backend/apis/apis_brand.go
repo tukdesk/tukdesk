@@ -58,8 +58,7 @@ func (this *BrandModule) brandUpdate(c web.C, w http.ResponseWriter, r *http.Req
 		setM["base.name"] = args.Base.Name
 	}
 
-	if args.Base.Logo != "" && args.Base.Logo != brand.Base.Logo {
-		helpers.ValidationForBrandLogo(v, "logo", args.Base.Logo)
+	if args.Base.Logo != nil {
 		setM["base.logo"] = args.Base.Logo
 	}
 

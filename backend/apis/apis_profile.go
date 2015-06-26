@@ -51,8 +51,7 @@ func (this *ProfileModule) profileUpdate(c web.C, w http.ResponseWriter, r *http
 		setM["base.name"] = args.Base.Name
 	}
 
-	if args.Base.Avatar != "" && args.Base.Avatar != user.Base.Avatar {
-		helpers.ValidationForUserAvatar(v, "avatar", args.Base.Avatar)
+	if args.Base.Avatar != nil {
 		setM["base.avatar"] = args.Base.Avatar
 	}
 

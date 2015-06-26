@@ -24,11 +24,6 @@ func ValidationForBrandName(v *validation.Validation, key, name string) *validat
 	return v
 }
 
-func ValidationForBrandLogo(v *validation.Validation, key, logo string) *validation.Validation {
-	v.MaxSize(key, logo, LimitedDataFieldMaxLength)
-	return v
-}
-
 // email
 func ValidationForEmail(v *validation.Validation, key, email string) *validation.Validation {
 	v.Required(key, email)
@@ -48,11 +43,6 @@ func ValidationForUserPassword(v *validation.Validation, key, password string) *
 func ValidationForUserName(v *validation.Validation, key, name string) *validation.Validation {
 	v.Required(key, name)
 	v.MaxSize(key, name, UserNameMaxLength)
-	return v
-}
-
-func ValidationForUserAvatar(v *validation.Validation, key, avatar string) *validation.Validation {
-	v.MaxSize(key, avatar, LimitedDataFieldMaxLength)
 	return v
 }
 

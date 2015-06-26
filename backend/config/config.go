@@ -5,8 +5,8 @@ type Config struct {
 
 	Salt string `json:"salt"`
 
-	Database   DatabaseConfig   `json:"database"`
-	Attachment AttachmentConfig `json:"attachment"`
+	Database DatabaseConfig `json:"database"`
+	File     FileConfig     `json:"file"`
 }
 
 type DatabaseConfig struct {
@@ -14,11 +14,11 @@ type DatabaseConfig struct {
 	DBName string `json:"dbname"`
 }
 
-type AttachmentConfig struct {
-	Internal InternalAttachmentConfig `json:"internal"`
+type FileConfig struct {
+	Internal InternalFileConfig `json:"internal"`
 }
 
-type InternalAttachmentConfig struct {
+type InternalFileConfig struct {
 	Dir       string `json:"dir"`
 	SizeLimit int64  `json:"size_limit"`
 }

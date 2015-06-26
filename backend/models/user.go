@@ -18,7 +18,7 @@ type UserLoginInfo struct {
 
 type UserBaseInfo struct {
 	Name   string `json:"name" bson:"name"`
-	Avatar string `json:"avatar" bson:"avatar"`
+	Avatar *File  `json:"avatar,omitempty" bson:"avatar,omitempty"`
 }
 
 type UserPersonalInfo struct {
