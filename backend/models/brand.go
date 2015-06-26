@@ -51,9 +51,9 @@ func (this *Brand) Insert() error {
 }
 
 func (this *Brand) FindAndModify(query, change map[string]interface{}) error {
-	return FindAndModify(BrandCollectionName, query, change, this)
+	return FindAndModify(BrandCollectionName, query, nil, change, this)
 }
 
 func (this *Brand) FindOne(query map[string]interface{}) error {
-	return FindOne(BrandCollectionName, query, this)
+	return FindOne(BrandCollectionName, query, nil, this)
 }

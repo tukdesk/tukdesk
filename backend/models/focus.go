@@ -44,11 +44,11 @@ func (this *Focus) Insert() error {
 }
 
 func (this *Focus) FindById(id interface{}) error {
-	return FindById(FocusCollectionName, id, this)
+	return FindById(FocusCollectionName, id, nil, this)
 }
 
 func (this *Focus) FindAndModify(query, change map[string]interface{}) error {
-	return FindAndModify(FocusCollectionName, query, change, this)
+	return FindAndModify(FocusCollectionName, query, nil, change, this)
 }
 
 func (this *Focus) Count(query map[string]interface{}) (int, error) {
@@ -57,7 +57,7 @@ func (this *Focus) Count(query map[string]interface{}) (int, error) {
 
 func (this *Focus) List(query map[string]interface{}, start, limit int, sort []string) ([]*Focus, error) {
 	list := make([]*Focus, 0, listCap)
-	return list, List(FocusCollectionName, query, start, limit, sort, &list)
+	return list, List(FocusCollectionName, query, nil, start, limit, sort, &list)
 }
 
 func (this *Focus) UpdateById(id interface{}, change map[string]interface{}) error {

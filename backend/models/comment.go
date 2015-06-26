@@ -46,18 +46,18 @@ func (this *Comment) Insert() error {
 }
 
 func (this *Comment) FindById(id interface{}) error {
-	return FindById(CommentCollectionName, id, this)
+	return FindById(CommentCollectionName, id, nil, this)
 }
 
 func (this *Comment) FindOne(query map[string]interface{}) error {
-	return FindOne(CommentCollectionName, query, this)
+	return FindOne(CommentCollectionName, query, nil, this)
 }
 
 func (this *Comment) FindAll(query map[string]interface{}, sort []string) ([]*Comment, error) {
 	all := make([]*Comment, 0, listCap)
-	return all, FindAll(CommentCollectionName, query, sort, &all)
+	return all, FindAll(CommentCollectionName, query, nil, sort, &all)
 }
 
 func (this *Comment) FindAndModify(query, change map[string]interface{}) error {
-	return FindAndModify(CommentCollectionName, query, change, this)
+	return FindAndModify(CommentCollectionName, query, nil, change, this)
 }

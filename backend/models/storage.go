@@ -18,18 +18,18 @@ func Insert(collName string, doc ...interface{}) error {
 	return c.Insert(doc...)
 }
 
-func FindById(collName string, id, result interface{}) error {
+func FindById(collName string, id interface{}, projection map[string]interface{}, result interface{}) error {
 	c := storage.GetCollection(collName)
 	defer storage.ReleaseCollection(c)
 
-	return c.FindById(id, result)
+	return c.FindById(id, projection, result)
 }
 
-func FindOne(collName string, query map[string]interface{}, result interface{}) error {
+func FindOne(collName string, query, projection map[string]interface{}, result interface{}) error {
 	c := storage.GetCollection(collName)
 	defer storage.ReleaseCollection(c)
 
-	return c.FindOne(query, result)
+	return c.FindOne(query, projection, result)
 }
 
 func Count(collName string, query map[string]interface{}) (int, error) {
@@ -39,25 +39,25 @@ func Count(collName string, query map[string]interface{}) (int, error) {
 	return c.Count(query)
 }
 
-func List(collName string, query map[string]interface{}, start, limit int, sort []string, result interface{}) error {
+func List(collName string, query, projection map[string]interface{}, start, limit int, sort []string, result interface{}) error {
 	c := storage.GetCollection(collName)
 	defer storage.ReleaseCollection(c)
 
-	return c.List(query, start, limit, sort, result)
+	return c.List(query, projection, start, limit, sort, result)
 }
 
-func FindAll(collName string, query map[string]interface{}, sort []string, result interface{}) error {
+func FindAll(collName string, query, projection map[string]interface{}, sort []string, result interface{}) error {
 	c := storage.GetCollection(collName)
 	defer storage.ReleaseCollection(c)
 
-	return c.FindAll(query, sort, result)
+	return c.FindAll(query, projection, sort, result)
 }
 
-func FindAndModify(collName string, query, change map[string]interface{}, result interface{}) error {
+func FindAndModify(collName string, query, projection, change map[string]interface{}, result interface{}) error {
 	c := storage.GetCollection(collName)
 	defer storage.ReleaseCollection(c)
 
-	return c.FindAndModify(query, change, result)
+	return c.FindAndModify(query, projection, change, result)
 }
 
 func FindOrInsert(collName string, query map[string]interface{}, doc, result interface{}) (bool, error) {
