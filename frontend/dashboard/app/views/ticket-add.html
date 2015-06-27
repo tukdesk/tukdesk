@@ -22,13 +22,14 @@
                     </div>
                     <div class="form-group">
                         <label for="ticketNewContent">描述</label>
-                        <textarea name="ticketNewContent" id="ticketNewContent" class="form-control" ng-model="ticketAddInfo.content"></textarea>
+                        <textarea ng-autosize="autosizeConf" name="ticketNewContent" id="ticketNewContent" class="form-control" ng-model="ticketAddInfo.content"></textarea>
                     </div>
                     <div class="form-group">
                         <label>附件</label>
                         <div ng-repeat="item in ticketAddInfo.attachmentItems">
                             <span ng-hide="item.progress === 100"><span ng-bind="item.progress"></span>%</span>
                             <span ng-show="item.attachment" ng-bind="item.attachment.fileName"></span>
+                            <span ng-show="item.attachment" class="tuk-clickable" ng-click="ticketAddInfo.attachmentItems.splice($index, 1)"><i class="fa fa-minus"></i></span>
                         </div>
                     </div>
                     <a class="btn btn-default" ngf-select ngf-change="attachmentUpload($files, $event, $rejectedFiles)" ngf-max-size="sizeLimit">上传附件</a>
