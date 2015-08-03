@@ -52,6 +52,11 @@ func main() {
 	apis.RegisterProfileModule(cfg, mux)
 	apis.RegisterTicketsModule(cfg, mux)
 	apis.RegisterUserModule(cfg, mux)
+	apis.RegisterFocusModule(cfg, mux)
+
+	if err := apis.RegisterFileModule(cfg, mux); err != nil {
+		log.Fatalln(err)
+	}
 
 	log.Println("Server on ", cfg.Addr)
 	if err := graceful.Serve(app, cfg.Addr); err != nil {
