@@ -11,9 +11,8 @@ func CurrentUser(h echo.HandlerFunc) echo.HandlerFunc {
 	return func(c *echo.Context) error {
 		user, err := GetCurrentUserFromContext(c)
 
-		logger := GetLogger(c)
-
 		if err != nil {
+			logger := GetLogger(c)
 			logger.Error(err)
 			return ErrInternalError
 		}
@@ -21,7 +20,6 @@ func CurrentUser(h echo.HandlerFunc) echo.HandlerFunc {
 		c.Set(currentUserKey, user)
 
 		defer func() {
-			logger.Info("clean user")
 			c.Set(currentUserKey, nil)
 		}()
 
