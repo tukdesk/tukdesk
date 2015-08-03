@@ -1,16 +1,12 @@
 package apis
 
 import (
-	"net/http"
+	"github.com/labstack/echo"
+	"github.com/tukdesk/httputils/validation"
 
 	"github.com/tukdesk/tukdesk/backend/config"
 	"github.com/tukdesk/tukdesk/backend/models"
 	"github.com/tukdesk/tukdesk/backend/models/helpers"
-
-	"github.com/tukdesk/httputils/gojimiddleware"
-	"github.com/tukdesk/httputils/validation"
-	"github.com/tukdesk/httputils/xlogger"
-	"github.com/zenazn/goji/web"
 )
 
 var (
@@ -22,27 +18,28 @@ type TicketModule struct {
 	cfg *config.Config
 }
 
-func RegisterTicketsModule(cfg *config.Config, app *web.Mux) *web.Mux {
+func RegisterTicketsModule(cfg *config.Config, mux *echo.Group) {
 	m := TicketModule{
 		cfg: cfg,
 	}
 
-	mux := web.New()
-	mux.Get("", m.ticketList)
-	mux.Post("", m.ticketAdd)
-	mux.Get("/:ticketId", m.ticketInfo)
-	mux.Put("/:ticketId", m.ticketUpdate)
-	mux.Get("/:ticketId/comments", m.commentList)
-	mux.Post("/:ticketId/comments", m.commentAdd)
-	mux.Put("/:ticketId/comments/:commentId", m.commentUpdate)
-	mux.Use(CurrentUser)
+	group := mux.Group("/tickets")
+	group.Use(CurrentUser)
 
-	gojimiddleware.RegisterSubroute("/tickets", app, mux)
-	return mux
+	group.Get("", m.ticketList)
+	group.Post("", m.ticketAdd)
+	group.Get("/:ticketId", m.ticketInfo)
+	group.Put("/:ticketId", m.ticketUpdate)
+	group.Get("/:ticketId/comments", m.commentList)
+	group.Post("/:ticketId/comments", m.commentAdd)
+	group.Put("/:ticketId/comments/:commentId", m.commentUpdate)
+	return
 }
 
-func (this *TicketModule) ticketList(c web.C, w http.ResponseWriter, r *http.Request) {
-	user := GetCurrentUser(&c, w, r)
+func (this *TicketModule) ticketList(c *echo.Context) error {
+	user := GetCurrentUser(c)
+
+	r := c.Request()
 
 	isAgent := AuthorizedAsAgent(user)
 	isLogged := isAgent || AuthorizedLogged(user)
@@ -77,21 +74,19 @@ func (this *TicketModule) ticketList(c web.C, w http.ResponseWriter, r *http.Req
 	}
 	sort = append(sort, defaultTicketsSort...)
 
-	logger := GetLogger(&c, w, r)
+	logger := GetLogger(c)
 
 	// get list and count
 	count, err := helpers.TicketCount(filter)
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
 	tickets, err := helpers.TicketListAfter(filter, listArgs.LastId, listArgs.Limit, sort)
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
 	items := make([]*helpers.OutputTicket, len(tickets))
@@ -116,29 +111,26 @@ func (this *TicketModule) ticketList(c web.C, w http.ResponseWriter, r *http.Req
 			info, err := infoParser(ticket)
 			if err != nil {
 				logger.Error(err)
-				abort(ErrInternalError)
-				return
+				return ErrInternalError
 			}
 			if showComments {
 				if err = info.GetComments(commentQuery, defaultCommentSort); err != nil {
 					logger.Error(err)
-					abort(ErrInternalError)
-					return
+					return ErrInternalError
 				}
 			}
 			items[i] = info
 		}
 	}
 
-	OutputJson(ListResultNew(count, items), w, r)
-	return
+	return OutputJson(ListResultNew(count, items), c)
 }
 
-func (this *TicketModule) ticketAdd(c web.C, w http.ResponseWriter, r *http.Request) {
-	user := GetCurrentUser(&c, w, r)
+func (this *TicketModule) ticketAdd(c *echo.Context) error {
+	user := GetCurrentUser(c)
 
 	args := &TicketAddArgs{}
-	GetJsonArgsFromRequest(r, args)
+	GetJsonArgsFromContext(c, args)
 
 	if args.Subject == "" {
 		args.Subject = helpers.TicketGetValidSubject(args.Content)
@@ -158,7 +150,7 @@ func (this *TicketModule) ticketAdd(c web.C, w http.ResponseWriter, r *http.Requ
 
 	CheckValidation(v)
 
-	var ticketMaker func(user *models.User, args *TicketAddArgs, v *validation.Validation, logger *xlogger.XLogger) *models.Ticket
+	var ticketMaker func(user *models.User, args *TicketAddArgs, v *validation.Validation) (*models.Ticket, error)
 	if AuthorizedAsAgent(user) {
 		ticketMaker = this.ticketMakerForAgent
 	} else if AuthorizedLogged(user) {
@@ -167,36 +159,36 @@ func (this *TicketModule) ticketAdd(c web.C, w http.ResponseWriter, r *http.Requ
 		ticketMaker = this.ticketMakerForAnonym
 	}
 
-	logger := GetLogger(&c, w, r)
+	logger := GetLogger(c)
 
-	ticket := ticketMaker(user, args, v, logger)
+	ticket, err := ticketMaker(user, args, v)
+	if err != nil {
+		logger.Error(err)
+		return ErrInternalError
+	}
 
 	// check automation
 
-	err := helpers.TicketInit(ticket, args.Content, args.Attachments)
+	err = helpers.TicketInit(ticket, args.Content, args.Attachments)
 	if helpers.IsDup(err) {
-		abort(ErrTicketDuplicate)
-		return
+		return ErrTicketDuplicate
 	}
 
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
 	info, err := helpers.OutputTicketPublicInfo(ticket)
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
-	OutputJson(info, w, r)
-	return
+	return OutputJson(info, c)
 }
 
-func (this *TicketModule) ticketMakerForAnonym(user *models.User, args *TicketAddArgs, v *validation.Validation, logger *xlogger.XLogger) *models.Ticket {
+func (this *TicketModule) ticketMakerForAnonym(user *models.User, args *TicketAddArgs, v *validation.Validation) (*models.Ticket, error) {
 	// 需要 email; 不可设置 status, isPublic;
 	helpers.ValidationForEmail(v, "email", args.Email)
 
@@ -204,22 +196,20 @@ func (this *TicketModule) ticketMakerForAnonym(user *models.User, args *TicketAd
 
 	creator, _, err := helpers.UserMustForChannelEmail(args.Email, helpers.UserGetValidNameFromEmail(args.Email))
 	if err != nil {
-		logger.Error(err)
-		abort(ErrInternalError)
-		return nil
+		return nil, err
 	}
 
-	return helpers.TicketNewWithChannelName(creator, args.Channel, args.Subject, args.Extend)
+	return helpers.TicketNewWithChannelName(creator, args.Channel, args.Subject, args.Extend), nil
 }
 
-func (this *TicketModule) ticketMakerForClient(user *models.User, args *TicketAddArgs, v *validation.Validation, logger *xlogger.XLogger) *models.Ticket {
+func (this *TicketModule) ticketMakerForClient(user *models.User, args *TicketAddArgs, v *validation.Validation) (*models.Ticket, error) {
 	// 不需要 email; 不可设置 status;
 	ticket := helpers.TicketNewWithChannelName(user, args.Channel, args.Subject, args.Extend)
 	ticket.IsPublic = args.IsPublic
-	return ticket
+	return ticket, nil
 }
 
-func (this *TicketModule) ticketMakerForAgent(user *models.User, args *TicketAddArgs, v *validation.Validation, logger *xlogger.XLogger) *models.Ticket {
+func (this *TicketModule) ticketMakerForAgent(user *models.User, args *TicketAddArgs, v *validation.Validation) (*models.Ticket, error) {
 	// 需要 email;
 	helpers.ValidationForEmail(v, "email", args.Email)
 	helpers.ValidationForTicketStatusOnCreate(v, "status", args.Status)
@@ -228,9 +218,7 @@ func (this *TicketModule) ticketMakerForAgent(user *models.User, args *TicketAdd
 
 	creator, _, err := helpers.UserMustForChannelEmail(args.Email, helpers.UserGetValidNameFromEmail(args.Email))
 	if err != nil {
-		logger.Error(err)
-		abort(ErrInternalError)
-		return nil
+		return nil, err
 	}
 
 	// todo accept chId for agent?
@@ -238,30 +226,27 @@ func (this *TicketModule) ticketMakerForAgent(user *models.User, args *TicketAdd
 	ticket.IsPublic = args.IsPublic
 	ticket.Status = args.Status
 
-	return ticket
+	return ticket, nil
 }
 
-func (this *TicketModule) ticketInfo(c web.C, w http.ResponseWriter, r *http.Request) {
-	user := GetCurrentUser(&c, w, r)
+func (this *TicketModule) ticketInfo(c *echo.Context) error {
+	user := GetCurrentUser(c)
 
-	ticketId, ok := helpers.IdFromString(c.URLParams["ticketId"])
+	ticketId, ok := helpers.IdFromString(c.Param("ticketId"))
 	if !ok {
-		abort(ErrInvalidId)
-		return
+		return ErrInvalidId
 	}
 
-	logger := GetLogger(&c, w, r)
+	logger := GetLogger(c)
 
 	ticket, err := helpers.TicketFindById(ticketId)
 	if helpers.IsNotFound(err) {
-		abort(ErrTicketNotFound)
-		return
+		return ErrTicketNotFound
 	}
 
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
 	showDetail := AuthorizedAsAgent(user) || AuthorizedAsSpecifiedUser(user, ticket.CreatorId)
@@ -275,38 +260,33 @@ func (this *TicketModule) ticketInfo(c web.C, w http.ResponseWriter, r *http.Req
 	output, err := infoParser(ticket)
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
-	OutputJson(output, w, r)
-	return
+	return OutputJson(output, c)
 }
 
-func (this *TicketModule) ticketUpdate(c web.C, w http.ResponseWriter, r *http.Request) {
+func (this *TicketModule) ticketUpdate(c *echo.Context) error {
 	// 仅修改工单属性, 不修改内容, 因此不向 client 开放
-	CheckAuthorizedAsAgent(&c, w, r)
+	CheckAuthorizedAsAgent(c)
 
-	ticketId, ok := helpers.IdFromString(c.URLParams["ticketId"])
+	ticketId, ok := helpers.IdFromString(c.Param("ticketId"))
 	if !ok {
-		abort(ErrInvalidId)
-		return
+		return ErrInvalidId
 	}
 
-	args := GetMapArgsFromRequest(r)
+	args := GetMapArgsFromContext(c)
 
-	logger := GetLogger(&c, w, r)
+	logger := GetLogger(c)
 
 	ticket, err := helpers.TicketFindById(ticketId)
 	if helpers.IsNotFound(err) {
-		abort(ErrTicketNotFound)
-		return
+		return ErrTicketNotFound
 	}
 
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
 	setM := helpers.M{}
@@ -317,8 +297,7 @@ func (this *TicketModule) ticketUpdate(c web.C, w http.ResponseWriter, r *http.R
 		case "priority":
 			priorityStr, ok := val.(string)
 			if !ok {
-				abort(ErrorInvalidArgType(name, helpers.JSONTypeNameString))
-				return
+				return ErrorInvalidArgType(name, helpers.JSONTypeNameString)
 			}
 
 			priority := models.NewTypePriority(priorityStr)
@@ -340,8 +319,7 @@ func (this *TicketModule) ticketUpdate(c web.C, w http.ResponseWriter, r *http.R
 
 			isPublic, ok := val.(bool)
 			if !ok {
-				abort(ErrorInvalidArgType(name, helpers.JSONTypeNameBoolen))
-				return
+				return ErrorInvalidArgType(name, helpers.JSONTypeNameBoolen)
 			}
 
 			setM[name] = isPublic
@@ -353,8 +331,7 @@ func (this *TicketModule) ticketUpdate(c web.C, w http.ResponseWriter, r *http.R
 
 			status, ok := val.(string)
 			if !ok {
-				abort(ErrorInvalidArgType(name, helpers.JSONTypeNameString))
-				return
+				return ErrorInvalidArgType(name, helpers.JSONTypeNameString)
 			}
 
 			helpers.ValidationForTicketStatusOnUpdate(v, name, status)
@@ -370,55 +347,47 @@ func (this *TicketModule) ticketUpdate(c web.C, w http.ResponseWriter, r *http.R
 
 		err := helpers.TicketFindAndModify(ticket, ChangeSetM(setM))
 		if helpers.IsNotFound(err) {
-			abort(ErrTicketNotFound)
-			return
+			return ErrTicketNotFound
 		}
 
 		if err != nil {
 			logger.Error(err)
-			abort(ErrInternalError)
-			return
+			return ErrInternalError
 		}
 	}
 
 	output, err := helpers.OutputTicketDetailInfo(ticket)
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
-	OutputJson(output, w, r)
-	return
+	return OutputJson(output, c)
 }
 
-func (this *TicketModule) commentList(c web.C, w http.ResponseWriter, r *http.Request) {
-	user := GetCurrentUser(&c, w, r)
+func (this *TicketModule) commentList(c *echo.Context) error {
+	user := GetCurrentUser(c)
 
-	ticketId, ok := helpers.IdFromString(c.URLParams["ticketId"])
+	ticketId, ok := helpers.IdFromString(c.Param("ticketId"))
 	if !ok {
-		abort(ErrInvalidId)
-		return
+		return ErrInvalidId
 	}
 
-	logger := GetLogger(&c, w, r)
+	logger := GetLogger(c)
 
 	ticket, err := helpers.TicketFindById(ticketId)
 	if helpers.IsNotFound(err) {
-		abort(ErrTicketNotFound)
-		return
+		return ErrTicketNotFound
 	}
 
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
 	// 非公开 ticket, agent 或 题主可见
 	if !ticket.IsPublic && !AuthorizedAsAgent(user) && !AuthorizedAsSpecifiedUser(user, ticket.CreatorId) {
-		abort(ErrUnauthorized)
-		return
+		return ErrUnauthorized
 	}
 
 	// 游客可见: public, question, feedback
@@ -432,8 +401,7 @@ func (this *TicketModule) commentList(c web.C, w http.ResponseWriter, r *http.Re
 	comments, err := helpers.CommentFindAllByTicketId(ticket.Id, query, defaultCommentSort)
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
 	items := make([]*helpers.OutputComment, len(comments))
@@ -443,28 +411,25 @@ func (this *TicketModule) commentList(c web.C, w http.ResponseWriter, r *http.Re
 			info, err := helpers.OutputCommentInfo(comment)
 			if err != nil {
 				logger.Error(err)
-				abort(ErrInternalError)
-				return
+				return ErrInternalError
 			}
 			items[i] = info
 		}
 	}
 
-	OutputJson(ListResultNew(len(items), items), w, r)
-	return
+	return OutputJson(ListResultNew(len(items), items), c)
 }
 
-func (this *TicketModule) commentAdd(c web.C, w http.ResponseWriter, r *http.Request) {
-	user := CheckAuthorizedLogged(&c, w, r)
+func (this *TicketModule) commentAdd(c *echo.Context) error {
+	user := CheckAuthorizedLogged(c)
 
-	ticketId, ok := helpers.IdFromString(c.URLParams["ticketId"])
+	ticketId, ok := helpers.IdFromString(c.Param("ticketId"))
 	if !ok {
-		abort(ErrInvalidId)
-		return
+		return ErrInvalidId
 	}
 
 	args := &CommentAddArgs{}
-	GetJsonArgsFromRequest(r, args)
+	GetJsonArgsFromContext(c, args)
 
 	v := helpers.ValidationNew()
 	helpers.ValidationForCommentTypeOnCreate(v, "type", args.Type)
@@ -474,35 +439,30 @@ func (this *TicketModule) commentAdd(c web.C, w http.ResponseWriter, r *http.Req
 	switch args.Type {
 	case models.CommentTypePublic, models.CommentTypeInternal:
 		if !AuthorizedAsAgent(user) {
-			abort(ErrUnauthorized)
-			return
+			return ErrUnauthorized
 		}
 	}
 
-	logger := GetLogger(&c, w, r)
+	logger := GetLogger(c)
 
 	ticket, err := helpers.TicketFindById(ticketId)
 	if helpers.IsNotFound(err) {
-		abort(ErrTicketNotFound)
-		return
+		return ErrTicketNotFound
 	}
 
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
 	if !AuthorizedAsAgent(user) && !AuthorizedAsSpecifiedUser(user, ticket.CreatorId) {
-		abort(ErrUnauthorized)
-		return
+		return ErrUnauthorized
 	}
 
 	comment, err := helpers.CommentInsertForTicket(ticket, user, args.Type, args.Content, args.Attachments)
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
 	ticketSetM := helpers.M{}
@@ -519,71 +479,61 @@ func (this *TicketModule) commentAdd(c web.C, w http.ResponseWriter, r *http.Req
 		ticketSetM["updated"] = NowUnix()
 		if err := helpers.TicketFindAndModify(ticket, ChangeSetM(ticketSetM)); err != nil {
 			logger.Error(err)
-			abort(ErrInternalError)
-			return
+			return ErrInternalError
 		}
 	}
 
 	output, err := helpers.OutputCommentInfo(comment)
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
-	OutputJson(output, w, r)
-	return
+	return OutputJson(output, c)
 }
 
-func (this *TicketModule) commentUpdate(c web.C, w http.ResponseWriter, r *http.Request) {
+func (this *TicketModule) commentUpdate(c *echo.Context) error {
 	// 当 comment 类型为 internal 时, 可以修改内容, 或将类型修改为 public
-	CheckAuthorizedAsAgent(&c, w, r)
+	CheckAuthorizedAsAgent(c)
 
-	ticketId, ok := helpers.IdFromString(c.URLParams["ticketId"])
+	ticketId, ok := helpers.IdFromString(c.Param("ticketId"))
 	if !ok {
-		abort(ErrInvalidId)
-		return
+		return ErrInvalidId
 	}
 
-	commentId, ok := helpers.IdFromString(c.URLParams["commentId"])
+	commentId, ok := helpers.IdFromString(c.Param("commentId"))
 	if !ok {
-		abort(ErrInvalidId)
-		return
+		return ErrInvalidId
 	}
 
-	args := GetMapArgsFromRequest(r)
+	args := GetMapArgsFromContext(c)
 
 	// get ticket and comment
-	logger := GetLogger(&c, w, r)
+	logger := GetLogger(c)
 
 	ticket, err := helpers.TicketFindById(ticketId)
 	if helpers.IsNotFound(err) {
-		abort(ErrTicketNotFound)
-		return
+		return ErrTicketNotFound
 	}
 
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
 	comment, err := helpers.CommentFindByTicketIdAndCommentId(ticketId, commentId)
 	if helpers.IsNotFound(err) {
-		abort(ErrCommentNotFound)
-		return
+		return ErrCommentNotFound
 	}
 
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
 	// 非 internal 的 comment, 不可修改
 	if comment.Type != models.CommentTypeInternal {
-		abort(ErrCommentUnchangeable)
-		return
+		return ErrCommentUnchangeable
 	}
 
 	v := helpers.ValidationNew()
@@ -600,8 +550,7 @@ func (this *TicketModule) commentUpdate(c web.C, w http.ResponseWriter, r *http.
 
 			commentType, ok := val.(string)
 			if !ok {
-				abort(ErrorInvalidArgType(name, helpers.JSONTypeNameString))
-				return
+				return ErrorInvalidArgType(name, helpers.JSONTypeNameString)
 			}
 
 			helpers.ValidationForCommentTypeOnUpdate(v, name, commentType)
@@ -620,8 +569,7 @@ func (this *TicketModule) commentUpdate(c web.C, w http.ResponseWriter, r *http.
 
 			content, ok := val.(string)
 			if !ok {
-				abort(ErrorInvalidArgType(name, helpers.JSONTypeNameString))
-				return
+				return ErrorInvalidArgType(name, helpers.JSONTypeNameString)
 			}
 
 			commentSetM[name] = content
@@ -634,8 +582,7 @@ func (this *TicketModule) commentUpdate(c web.C, w http.ResponseWriter, r *http.
 		ticketSetM["updated"] = now
 		if err := helpers.TicketFindAndModify(ticket, ChangeSetM(ticketSetM)); err != nil {
 			logger.Error(err)
-			abort(ErrInternalError)
-			return
+			return ErrInternalError
 		}
 	}
 
@@ -643,18 +590,15 @@ func (this *TicketModule) commentUpdate(c web.C, w http.ResponseWriter, r *http.
 		commentSetM["updated"] = now
 		if err := helpers.CommentFindAndModify(comment, ChangeSetM(commentSetM)); err != nil {
 			logger.Error(err)
-			abort(ErrInternalError)
-			return
+			return ErrInternalError
 		}
 	}
 
 	output, err := helpers.OutputCommentInfo(comment)
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
-	OutputJson(output, w, r)
-	return
+	return OutputJson(output, c)
 }

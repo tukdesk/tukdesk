@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	StatusCodeOK            = http.StatusOK
 	StatusCodeInternalError = 579
 
 	ErrCodeInvalidRequestBody    = 990101

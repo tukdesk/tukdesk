@@ -2,17 +2,20 @@ package apis
 
 import (
 	"fmt"
-	"net/http"
 	"time"
 
-	"github.com/tukdesk/tukdesk/backend/models"
-	"github.com/tukdesk/tukdesk/backend/models/helpers"
-	"github.com/zenazn/goji/web"
-
-	"github.com/tukdesk/httputils/gojimiddleware"
+	"github.com/labstack/echo"
+	emw "github.com/tukdesk/httputils/echomiddleware"
 	"github.com/tukdesk/httputils/jsonutils"
 	"github.com/tukdesk/httputils/validation"
 	"github.com/tukdesk/httputils/xlogger"
+
+	"github.com/tukdesk/tukdesk/backend/models"
+	"github.com/tukdesk/tukdesk/backend/models/helpers"
+)
+
+const (
+	currentUserKey = "_user"
 )
 
 func abort(err error) {
@@ -34,16 +37,21 @@ func GetCurrentBrand() *models.Brand {
 	return brand
 }
 
-func CheckAuthorizedAsAgent(c *web.C, w http.ResponseWriter, r *http.Request) *models.User {
-	user := GetCurrentUser(c, w, r)
+func GetCurrentUser(c *echo.Context) *models.User {
+	user, _ := c.Get(currentUserKey).(*models.User)
+	return user
+}
+
+func CheckAuthorizedAsAgent(c *echo.Context) *models.User {
+	user := GetCurrentUser(c)
 	if !AuthorizedAsAgent(user) {
 		abort(ErrAgentOnly)
 	}
 	return user
 }
 
-func CheckAuthorizedLogged(c *web.C, w http.ResponseWriter, r *http.Request) *models.User {
-	user := GetCurrentUser(c, w, r)
+func CheckAuthorizedLogged(c *echo.Context) *models.User {
+	user := GetCurrentUser(c)
 	if !AuthorizedLogged(user) {
 		abort(ErrUnlogged)
 	}
@@ -60,29 +68,28 @@ func CheckValidation(v *validation.Validation) {
 	return
 }
 
-func GetJsonArgsFromRequest(r *http.Request, args interface{}) {
-	if err := jsonutils.GetJsonArgsFromRequest(r, args); err != nil {
+func GetJsonArgsFromContext(c *echo.Context, args interface{}) {
+	if err := jsonutils.GetJsonArgsFromRequest(c.Request(), args); err != nil {
 		abort(ErrorInvalidRequestBodyWithError(err))
 		return
 	}
 }
 
-func GetMapArgsFromRequest(r *http.Request) map[string]interface{} {
+func GetMapArgsFromContext(c *echo.Context) map[string]interface{} {
 	m := map[string]interface{}{}
-	if err := jsonutils.GetJsonArgsFromRequest(r, &m); err != nil {
+	if err := jsonutils.GetJsonArgsFromRequest(c.Request(), &m); err != nil {
 		abort(ErrorInvalidRequestBodyWithError(err))
 		return nil
 	}
 	return m
 }
 
-func GetLogger(c *web.C, w http.ResponseWriter, r *http.Request) *xlogger.XLogger {
-	return gojimiddleware.GetRequestLogger(c, w, r)
+func GetLogger(c *echo.Context) *xlogger.XLogger {
+	return emw.GetRequestLogger(c)
 }
 
-func OutputJson(data interface{}, w http.ResponseWriter, r *http.Request) {
-	jsonutils.OutputJson(data, w, r)
-	return
+func OutputJson(data interface{}, c *echo.Context) error {
+	return c.JSON(StatusCodeOK, data)
 }
 
 func ChangeSetM(setM map[string]interface{}) helpers.M {

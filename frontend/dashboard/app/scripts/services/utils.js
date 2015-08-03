@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module("tukdesk")
-    .factory("utils", function(ticketStatus, ticketPriority, commentTypes) {
+    .factory("utils", function($filter, ticketStatus, ticketPriority, commentTypes) {
         var fac = {};
 
         fac.ticketStatusClass = function(statusStr) {
@@ -55,15 +55,14 @@ angular.module("tukdesk")
             var day = 24 * hour;
             var month = 30 * day;
 
-            var now = (new Date()).valueOf() / 1000;
-            var delta = now - then;
+            var now = (new Date());
+            var delta = now.valueOf() / 1000 - then;
             if (delta > month) {
                 var date = new Date(then * 1000);
-                var dateStr = date.getMonth() + "-" + date.getDay() + " " + date.getHours() + ":" + date.getMinutes();
                 if (date.getFullYear() === now.getFullYear()) {
-                    return dateStr
+                    return $filter("date")(date, "MM-dd HH:mm");
                 } else {
-                    return date.getFullYear() + "-" + dateStr;
+                    return $filter("date")(date, "yyyy-MM-dd HH:mm");
                 }
             } else if (delta > day) {
                 return parseInt(delta / day, 10) + "天前"

@@ -1,53 +1,46 @@
 package apis
 
 import (
-	"net/http"
+	"github.com/labstack/echo"
 
 	"github.com/tukdesk/tukdesk/backend/config"
 	"github.com/tukdesk/tukdesk/backend/models/helpers"
-
-	"github.com/tukdesk/httputils/gojimiddleware"
-	"github.com/zenazn/goji/web"
 )
 
 type BrandModule struct {
 	cfg *config.Config
 }
 
-func RegisterBrandModule(cfg *config.Config, app *web.Mux) *web.Mux {
+func RegisterBrandModule(cfg *config.Config, mux *echo.Group) {
 	m := BrandModule{
 		cfg: cfg,
 	}
 
-	mux := web.New()
+	group := mux.Group("/brand")
+	group.Use(CurrentUser)
 
-	mux.Get("", m.brandInfo)
-	mux.Put("", m.brandUpdate)
-	mux.Get("/key", m.brandAPIKey)
-	mux.Put("/key", m.brandResetAPIKey)
-	mux.Use(CurrentUser)
-
-	gojimiddleware.RegisterSubroute("/brand", app, mux)
-	return mux
+	group.Get("", m.brandInfo)
+	group.Put("", m.brandUpdate)
+	group.Get("/key", m.brandAPIKey)
+	group.Put("/key", m.brandResetAPIKey)
+	return
 }
 
-func (this *BrandModule) brandAPIKey(c web.C, w http.ResponseWriter, r *http.Request) {
-	CheckAuthorizedAsAgent(&c, w, r)
+func (this *BrandModule) brandAPIKey(c *echo.Context) error {
+	CheckAuthorizedAsAgent(c)
 	output := helpers.OutputBrandAPIKey(helpers.CurrentBrand().Authorization.APIKey)
-	OutputJson(output, w, r)
-	return
+	return OutputJson(output, c)
 }
 
-func (this *BrandModule) brandInfo(c web.C, w http.ResponseWriter, r *http.Request) {
-	OutputJson(helpers.CurrentBrand(), w, r)
-	return
+func (this *BrandModule) brandInfo(c *echo.Context) error {
+	return OutputJson(helpers.CurrentBrand(), c)
 }
 
-func (this *BrandModule) brandUpdate(c web.C, w http.ResponseWriter, r *http.Request) {
-	CheckAuthorizedAsAgent(&c, w, r)
+func (this *BrandModule) brandUpdate(c *echo.Context) error {
+	CheckAuthorizedAsAgent(c)
 
 	args := &BrandUpdateArgs{}
-	GetJsonArgsFromRequest(r, args)
+	GetJsonArgsFromContext(c, args)
 
 	v := helpers.ValidationNew()
 	setM := helpers.M{}
@@ -67,19 +60,17 @@ func (this *BrandModule) brandUpdate(c web.C, w http.ResponseWriter, r *http.Req
 	if len(setM) > 0 {
 		setM["updated"] = NowUnix()
 		if err := helpers.BrandUpdateCurrent(ChangeSetM(setM)); err != nil {
-			GetLogger(&c, w, r).Error(err)
-			abort(ErrInternalError)
-			return
+			GetLogger(c).Error(err)
+			return ErrInternalError
 		}
 
 	}
 
-	OutputJson(brand, w, r)
-	return
+	return OutputJson(brand, c)
 }
 
-func (this *BrandModule) brandResetAPIKey(c web.C, w http.ResponseWriter, r *http.Request) {
-	CheckAuthorizedAsAgent(&c, w, r)
+func (this *BrandModule) brandResetAPIKey(c *echo.Context) error {
+	CheckAuthorizedAsAgent(c)
 
 	newApiKey := helpers.BrandNewAPIKey()
 	setM := helpers.M{
@@ -88,12 +79,10 @@ func (this *BrandModule) brandResetAPIKey(c web.C, w http.ResponseWriter, r *htt
 	}
 
 	if err := helpers.BrandUpdateCurrent(ChangeSetM(setM)); err != nil {
-		GetLogger(&c, w, r).Error(err)
-		abort(ErrInternalError)
-		return
+		GetLogger(c).Error(err)
+		return ErrInternalError
 	}
 
 	output := helpers.OutputBrandAPIKey(helpers.CurrentBrand().Authorization.APIKey)
-	OutputJson(output, w, r)
-	return
+	return OutputJson(output, c)
 }

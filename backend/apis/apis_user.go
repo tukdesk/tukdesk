@@ -1,14 +1,11 @@
 package apis
 
 import (
-	"net/http"
+	"github.com/labstack/echo"
 
 	"github.com/tukdesk/tukdesk/backend/config"
 	"github.com/tukdesk/tukdesk/backend/models"
 	"github.com/tukdesk/tukdesk/backend/models/helpers"
-
-	"github.com/tukdesk/httputils/gojimiddleware"
-	"github.com/zenazn/goji/web"
 )
 
 var (
@@ -19,24 +16,25 @@ type UserModule struct {
 	cfg *config.Config
 }
 
-func RegisterUserModule(cfg *config.Config, app *web.Mux) *web.Mux {
+func RegisterUserModule(cfg *config.Config, mux *echo.Group) {
 	m := UserModule{
 		cfg: cfg,
 	}
 
-	mux := web.New()
-	mux.Get("", m.userList)
-	mux.Get("/:userId", m.userInfo)
-	mux.Put("/:userId", m.userUpdate)
-	mux.Use(CurrentUser)
+	group := mux.Group("/users")
+	group.Use(CurrentUser)
 
-	gojimiddleware.RegisterSubroute("/users", app, mux)
-	return mux
+	group.Get("", m.userList)
+	group.Get("/:userId", m.userInfo)
+	group.Put("/:userId", m.userUpdate)
+	return
 }
 
-func (this *UserModule) userList(c web.C, w http.ResponseWriter, r *http.Request) {
+func (this *UserModule) userList(c *echo.Context) error {
 	// 只有 agent 可以查看全员列表
-	CheckAuthorizedAsAgent(&c, w, r)
+	CheckAuthorizedAsAgent(c)
+
+	r := c.Request()
 
 	listArgs := GetListArgsFromRequest(r)
 	v := helpers.ValidationNew()
@@ -63,20 +61,18 @@ func (this *UserModule) userList(c web.C, w http.ResponseWriter, r *http.Request
 	}
 	sort = append(sort, defaultClientsSort...)
 
-	logger := GetLogger(&c, w, r)
+	logger := GetLogger(c)
 
 	count, err := helpers.ClientCount(query)
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
 	users, err := helpers.ClientListAfter(query, listArgs.LastId, listArgs.Limit, sort)
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
 	items := make([]*helpers.OutputUser, len(users))
@@ -86,31 +82,25 @@ func (this *UserModule) userList(c web.C, w http.ResponseWriter, r *http.Request
 		}
 	}
 
-	OutputJson(ListResultNew(count, items), w, r)
-	return
+	return OutputJson(ListResultNew(count, items), c)
 }
 
-func (this *UserModule) userInfo(c web.C, w http.ResponseWriter, r *http.Request) {
-	user := GetCurrentUser(&c, w, r)
-
-	userId, ok := helpers.IdFromString(c.URLParams["userId"])
+func (this *UserModule) userInfo(c *echo.Context) error {
+	userId, ok := helpers.IdFromString(c.Param("userId"))
 	if !ok {
-		abort(ErrInvalidId)
-		return
+		return ErrInvalidId
 	}
 
-	logger := GetLogger(&c, w, r)
+	logger := GetLogger(c)
 
 	user, err := helpers.UserFindById(userId)
 	if helpers.IsNotFound(err) {
-		abort(ErrUserNotFound)
-		return
+		return ErrUserNotFound
 	}
 
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrUserNotFound
 	}
 
 	var infoParser func(*models.User) *helpers.OutputUser
@@ -120,35 +110,31 @@ func (this *UserModule) userInfo(c web.C, w http.ResponseWriter, r *http.Request
 		infoParser = helpers.OutputUserBaseInfo
 	}
 
-	OutputJson(infoParser(user), w, r)
-	return
+	return OutputJson(infoParser(user), c)
 }
 
-func (this *UserModule) userUpdate(c web.C, w http.ResponseWriter, r *http.Request) {
+func (this *UserModule) userUpdate(c *echo.Context) error {
 	// 只有 agent 可以通过这个接口修改 user 信息
 	// 只能修改 client 信息
-	user := CheckAuthorizedAsAgent(&c, w, r)
+	user := CheckAuthorizedAsAgent(c)
 
-	userId, ok := helpers.IdFromString(c.URLParams["userId"])
+	userId, ok := helpers.IdFromString(c.Param("userId"))
 	if !ok {
-		abort(ErrInvalidId)
-		return
+		return ErrInvalidId
 	}
 
-	args := GetMapArgsFromRequest(r)
+	args := GetMapArgsFromContext(c)
 
-	logger := GetLogger(&c, w, r)
+	logger := GetLogger(c)
 
 	user, err := helpers.ClientFindById(userId)
 	if helpers.IsNotFound(err) {
-		abort(ErrUserNotFound)
-		return
+		return ErrUserNotFound
 	}
 
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
 	setM := helpers.M{}
@@ -159,8 +145,7 @@ func (this *UserModule) userUpdate(c web.C, w http.ResponseWriter, r *http.Reque
 		case "business":
 			businessMap, ok := val.(map[string]interface{})
 			if !ok {
-				abort(ErrorInvalidArgType(name, helpers.JSONTypeNameObject))
-				return
+				return ErrorInvalidArgType(name, helpers.JSONTypeNameObject)
 			}
 
 			if importanceStr, ok := businessMap["importance"].(string); ok {
@@ -183,11 +168,9 @@ func (this *UserModule) userUpdate(c web.C, w http.ResponseWriter, r *http.Reque
 		setM["updated"] = NowUnix()
 		if err := helpers.UserFindAndModify(user, ChangeSetM(setM)); err != nil {
 			logger.Error(err)
-			abort(ErrInternalError)
-			return
+			return ErrInternalError
 		}
 	}
 
-	OutputJson(helpers.OutputUserDetailInfo(user), w, r)
-	return
+	return OutputJson(helpers.OutputUserDetailInfo(user), c)
 }

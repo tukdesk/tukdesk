@@ -7,11 +7,10 @@ import (
 	"github.com/tukdesk/tukdesk/backend/config"
 	"github.com/tukdesk/tukdesk/backend/models/helpers"
 
-	"github.com/tukdesk/httputils/gojimiddleware"
+	"github.com/labstack/echo"
+	emw "github.com/tukdesk/httputils/echomiddleware"
 	"github.com/tukdesk/httputils/graceful"
-	"github.com/tukdesk/httputils/jsonutils"
 	"github.com/tukdesk/mgoutils"
-	"github.com/zenazn/goji/web"
 )
 
 func main() {
@@ -41,29 +40,21 @@ func main() {
 	}
 
 	// init app
-	app := web.New()
-	app.NotFound(jsonutils.NotFoundHandler)
-	apis.RegisterBaseModule(cfg, app)
-	apis.RegisterBrandModule(cfg, app)
-	apis.RegisterProfileModule(cfg, app)
-	apis.RegisterTicketsModule(cfg, app)
-	apis.RegisterUserModule(cfg, app)
-	apis.RegisterFocusModule(cfg, app)
+	app := echo.New()
+	app.SetHTTPErrorHandler(emw.JSONErrHandlerForAPIError())
+	app.Use(emw.RequestLogger())
+	app.Use(emw.RequestTimer())
+	app.Use(emw.JSONRecoverForAPIError())
 
-	if _, err := apis.RegisterFileModule(cfg, app); err != nil {
-		log.Fatalln(err)
-	}
-
-	server := web.New()
-
-	server.Use(gojimiddleware.RequestLogger)
-	server.Use(gojimiddleware.RequestTimer)
-	server.Use(gojimiddleware.RecovererJson)
-
-	gojimiddleware.RegisterSubroute("/apis/v1", server, app)
+	mux := app.Group("/apis/v1")
+	apis.RegisterBaseModule(cfg, mux)
+	apis.RegisterBrandModule(cfg, mux)
+	apis.RegisterProfileModule(cfg, mux)
+	apis.RegisterTicketsModule(cfg, mux)
+	apis.RegisterUserModule(cfg, mux)
 
 	log.Println("Server on ", cfg.Addr)
-	if err := graceful.Serve(server, cfg.Addr); err != nil {
+	if err := graceful.Serve(app, cfg.Addr); err != nil {
 		log.Fatalln(err)
 	}
 }

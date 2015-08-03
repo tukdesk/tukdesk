@@ -1,41 +1,35 @@
 package apis
 
 import (
-	"net/http"
-
 	"github.com/tukdesk/tukdesk/backend/config"
 	"github.com/tukdesk/tukdesk/backend/models/helpers"
 
-	"github.com/tukdesk/httputils/gojimiddleware"
-	"github.com/zenazn/goji/web"
+	"github.com/labstack/echo"
 )
 
 type BaseModule struct {
 	cfg *config.Config
 }
 
-func RegisterBaseModule(cfg *config.Config, app *web.Mux) *web.Mux {
+func RegisterBaseModule(cfg *config.Config, mux *echo.Group) {
 	m := BaseModule{
 		cfg: cfg,
 	}
 
-	mux := web.New()
+	group := mux.Group("/base")
+	group.Post("/init", m.brandInit)
+	group.Post("/signin", m.signin)
 
-	mux.Post("/init", m.brandInit)
-	mux.Post("/signin", m.signin)
-
-	gojimiddleware.RegisterSubroute("/base", app, mux)
-	return mux
+	return
 }
 
-func (this *BaseModule) brandInit(c web.C, w http.ResponseWriter, r *http.Request) {
+func (this *BaseModule) brandInit(c *echo.Context) error {
 	if helpers.CurrentBrand() != nil {
-		abort(ErrBrandAlreadyInitialized)
-		return
+		return ErrBrandAlreadyInitialized
 	}
 
 	args := &BrandInitArgs{}
-	GetJsonArgsFromRequest(r, args)
+	GetJsonArgsFromContext(c, args)
 
 	v := helpers.ValidationNew()
 	helpers.ValidationForBrandName(v, "brand name", args.BrandName)
@@ -47,19 +41,17 @@ func (this *BaseModule) brandInit(c web.C, w http.ResponseWriter, r *http.Reques
 
 	CheckValidation(v)
 
-	logger := GetLogger(&c, w, r)
+	logger := GetLogger(c)
 
 	// brand init
 	brand, err := helpers.BrandInit(args.BrandName)
 	if helpers.IsDup(err) {
-		abort(ErrBrandAlreadyInitialized)
-		return
+		return ErrBrandAlreadyInitialized
 	}
 
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
 	// user init
@@ -70,45 +62,39 @@ func (this *BaseModule) brandInit(c web.C, w http.ResponseWriter, r *http.Reques
 	_, err = helpers.AgentInit(args.Email, args.Name, args.Password, this.cfg.Salt)
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
-	OutputJson(brand, w, r)
-	return
+	return c.JSON(StatusCodeOK, brand)
 }
 
-func (this *BaseModule) signin(c web.C, w http.ResponseWriter, r *http.Request) {
+func (this *BaseModule) signin(c *echo.Context) error {
 	brand := GetCurrentBrand()
 
 	args := &SigninArgs{}
-	GetJsonArgsFromRequest(r, args)
+	GetJsonArgsFromContext(c, args)
 
 	v := helpers.ValidationNew()
 	helpers.ValidationForUserPassword(v, "password", args.Password)
 
 	CheckValidation(v)
 
-	logger := GetLogger(&c, w, r)
+	logger := GetLogger(c)
 
 	user, err := helpers.AgentFind()
 	if helpers.IsNotFound(err) {
-		abort(ErrAgentNotFound)
-		return
+		return ErrAgentNotFound
 	}
 
 	if err != nil {
 		logger.Error(err)
-		abort(ErrInternalError)
-		return
+		return ErrInternalError
 	}
 
 	if !helpers.UserCheckPassword(user, args.Password, this.cfg.Salt) {
-		abort(ErrAgentPasswordNotMatch)
-		return
+		return ErrAgentPasswordNotMatch
 	}
 
 	output := helpers.OutputTokenInfo(helpers.TokenForUser(user, brand.Authorization.APIKey), helpers.TokenDefaultExpirationSec)
-	OutputJson(output, w, r)
-	return
+	return c.JSON(StatusCodeOK, output)
 }
